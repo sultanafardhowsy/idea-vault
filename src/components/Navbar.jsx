@@ -178,6 +178,7 @@ const Navbar = () => {
           <div className="hidden md:flex md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
             <Link href="/" className="nav-link">Home</Link>
             <Link href="/show-alldata" className="nav-link">Ideas</Link>
+            <Link href="/updatepage" className="nav-link">Update Idea</Link>
           </div>
 
           {/* Desktop User/Auth + Theme Toggle */}

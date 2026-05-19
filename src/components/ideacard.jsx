@@ -1,52 +1,62 @@
 
+import { Button } from "@heroui/react";
 import Image from "next/image";
+import Link from "next/link";
+import { FiExternalLink } from "react-icons/fi";
 import { LuMapPin } from "react-icons/lu";
 
 
 const IdeaCard = ({ idea }) => {
 
   console.log(idea);
-  const {title,category, imageUrl, funding, founder, status,tags, description } = idea;
+  const {_id,title,category, imageUrl, funding, founder, status,tags, description } = idea;
 
   return (
-    <div className="border">
+    <div className="border rounded-2xl overflow-hidden shadow-md bg-white dark:bg-zinc-900 flex flex-col h-full">
      {imageUrl && imageUrl.trim() !== "" ? (
   <Image
-    className="object-cover"
+    className="w-full h-52 object-cover"
     alt={title}
     src={imageUrl}
-    height={200}
-    width={200}
+    height={300}
+    width={500}
   />
 ) : (
   /* This renders when the URL is empty or null */
   <div 
-    style={{ height: '400px', width: '400px' }} 
-    className="bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 font-medium"
+    className="w-full h-52 bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 font-medium"
   >
     🖼 No Image Available
   </div>
 )}
 
-      <div className="p-2">
-        <div className="flex items-center gap-1">
+      <div className="px-6 py-5 flex flex-col flex-1 gap-2">
+        <div className="flex items-center gap-1 text-sm bg-[#c9a96e] text-white px-2 py-1 rounded-full w-fit">
           <LuMapPin /> <span>{category}</span>
         </div>
-        <div className="flex justify-between">
+        
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1 line-clamp-1">{title}</h3>
+        
+        {description && (
+          <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3">
+            {description}
+          </p>
+        )}
+        
+        <div className="mt-auto pt-4 flex justify-between items-end border-t">
           <div>
-            <div>
-              <h2 className="text-xl font-bold">{founder}</h2>
-            </div>
-            <div className="flex gap-1 items-center">
-               {funding}
-            </div>
+            <div className="text-sm font-semibold">{founder}</div>
+            <div className="text-xs text-gray-500">Founder</div>
           </div>
-
-          <div>
-            <h3 className="text-2xl font-bold">$ {status}</h3>
+          <div className="text-right">
+            <div className="text-sm font-bold text-[#c9a96e]">{funding}</div>
+            <div className="text-xs text-gray-500">Funding</div>
           </div>
         </div>
-       
+        <div className="mt-2 text-right">
+            <span className="text-sm font-semibold text-green-600">{status}</span>
+        </div>
+         <Link href={`/show-alldata/${_id}`}><Button variant="ghost" className={'mt-1 text-cyan-500'}> <FiExternalLink/> View Details</Button></Link>
       </div>
     </div>
   );

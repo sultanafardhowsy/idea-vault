@@ -1,6 +1,5 @@
 'use client';
 
-import { title } from 'framer-motion/client';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -23,29 +22,22 @@ export default function NewIdeaPage() {
   const [tags, setTags]             = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  /* Default date created to today */
-  const todayISO = new Date().toISOString().split('T')[0];
-
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     const formData = new FormData(e.target);
     const payload = {
-      title:              formData.get('title'),
-      shortDescription:   formData.get('shortDescription'),
-      category:           formData.get('category'),
-      description:        formData.get('description'),
-      targetAudience:     formData.get('targetAudience'),
-      problemStatement:   formData.get('problemStatement'),
-      proposedSolution:   formData.get('proposedSolution'),
-      founder:            formData.get('founder'),
-      status:             formData.get('status') || 'New',
-      funding:            formData.get('funding') || '$0',
-      imageUrl:           formData.get('imageUrl') || '',
-      tags:               formData.get('tags')
+      title:       formData.get('title'),
+      category:    formData.get('category'),
+      description: formData.get('description'),
+      founder:     formData.get('founder'),
+      status:      formData.get('status') || 'New',
+      funding:     formData.get('funding') || '$0',
+      imageUrl:    formData.get('imageUrl') || '',
+      tags:        formData.get('tags')
         ? formData.get('tags').split(',').map(t => t.trim()).filter(Boolean)
         : [],
-      createdAt:          formData.get('createdAt') || todayISO,
+      createdAt: new Date().toISOString().split('T')[0],
     };
     try {
       const res = await fetch('http://localhost:5000/allidea', {
@@ -71,17 +63,16 @@ export default function NewIdeaPage() {
     headerBg:      dark ? '#161922'  : '#eaf5ff',
     headerBorder:  dark ? '#1e2535'  : '#c2e0f7',
     titleColor:    dark ? '#ffffff'  : '#1d6fa8',
-    subColor:      dark ? '#94a3b8'  : '#5a9ac0',
-    labelColor:    dark ? '#94a3b8'  : '#1d6fa8',
+    subColor:      dark ? '#94a3b8'  : '#5a9ac0', 
+    labelColor:    dark ? '#94a3b8'  : '#1d6fa8', 
     divider:       dark ? '#1e2535'  : '#c2e0f7',
     breadMuted:    dark ? '#64748b'  : '#7aaac8',
-    sectionLabel:  dark ? '#c9a96e'  : '#b5803a',
 
     /* Field tokens */
     fieldBg:       dark ? '#0f1420'  : '#d6edfb',
     fieldBorder:   dark ? '#252c42'  : '#93c9e8',
     fieldText:     dark ? '#ffffff'  : '#1d6fa8',
-    fieldPh:       dark ? '#4e5d78'  : '#7aaac8',
+    fieldPh:       dark ? '#4e5d78'  : '#7aaac8', 
     fieldFocusBdr: dark ? '#c9a96e'  : '#1d6fa8',
 
     /* Button */
@@ -89,7 +80,7 @@ export default function NewIdeaPage() {
     btnText:       dark ? '#0d0f14'  : '#ffffff',
   };
 
-  /* ── Structural layout properties shared by all fields ── */
+  /* ── Structural layout properties shared by all fields (NO PADDING SHORTHAND) ── */
   const baseFieldStyle = {
     display: 'block',
     width: '100%',
@@ -104,6 +95,7 @@ export default function NewIdeaPage() {
     transition: 'border-color 0.2s, box-shadow 0.2s, background-color 0.2s',
   };
 
+  /* ── Input elements get explicit non-conflicting paddings ── */
   const fieldStyle = {
     ...baseFieldStyle,
     paddingTop: '12px',
@@ -117,7 +109,7 @@ export default function NewIdeaPage() {
     paddingTop: '12px',
     paddingBottom: '12px',
     paddingLeft: '16px',
-    paddingRight: '40px',
+    paddingRight: '40px', // safely expanded without overlapping shorthand keys
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='${encodeURIComponent(token.fieldText)}' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 14px center',
@@ -137,35 +129,11 @@ export default function NewIdeaPage() {
     lineHeight: '1.6',
   };
 
-  const textareaSmStyle = {
-    ...textareaStyle,
-    minHeight: '80px',
-  };
-
-  const focusHandlers = {
-    onFocus: e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; },
-    onBlur:  e => { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; },
-  };
-
-  const SectionDivider = ({ label }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px', marginBottom: '4px' }}>
-      <div style={{ flex: 1, height: '1px', backgroundColor: token.divider }} />
-      <span style={{
-        fontSize: '10px', fontWeight: 700, letterSpacing: '0.1em',
-        textTransform: 'uppercase', color: token.sectionLabel,
-        whiteSpace: 'nowrap',
-      }}>
-        {label}
-      </span>
-      <div style={{ flex: 1, height: '1px', backgroundColor: token.divider }} />
-    </div>
-  );
-
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Epilogue:wght@300;400;500;600&display=swap');
-
+        
         .nip-fadein { animation: fadeUp 0.45s ease both; }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(16px); }
@@ -184,15 +152,10 @@ export default function NewIdeaPage() {
         .nip-input-field::placeholder { color: ${token.fieldPh} !important; opacity: 1; }
         .nip-input-field::-webkit-input-placeholder { color: ${token.fieldPh} !important; }
         .nip-input-field::-moz-placeholder { color: ${token.fieldPh} !important; }
-
+        
         .nip-select option {
           background-color: ${token.cardBg};
           color: ${token.fieldText};
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-          filter: ${dark ? 'invert(1) opacity(0.5)' : 'opacity(0.4)'};
-          cursor: pointer;
         }
       `}</style>
 
@@ -228,7 +191,7 @@ export default function NewIdeaPage() {
             transition: 'background-color 0.3s, border-color 0.3s',
           }}>
 
-            {/* Card Header */}
+            {/* Card Header Section */}
             <div style={{
               paddingTop: '2rem',
               paddingBottom: '2rem',
@@ -249,7 +212,7 @@ export default function NewIdeaPage() {
                 transition: 'color 0.3s',
               }}>
                 Submit an{' '}
-                <span style={{ color: dark ? '#c9a96e' : '#b5803a' }}>Innovation</span>
+                <span style={{ fontStyle: 'normal', color: dark ? '#c9a96e' : '#b5803a' }}>Innovation</span>
                 {' '}Idea
               </h1>
               <p style={{ marginTop: '8px', fontSize: '13px', color: token.subColor, transition: 'color 0.3s' }}>
@@ -257,38 +220,30 @@ export default function NewIdeaPage() {
               </p>
             </div>
 
-            {/* Form */}
+            {/* Main Form Fields Container */}
             <form onSubmit={handleSubmit} style={{ paddingTop: '2.5rem', paddingBottom: '2.5rem', paddingLeft: '2.5rem', paddingRight: '2.5rem', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-              {/* ── BASIC INFO ── */}
-              <SectionDivider label="Basic Info" />
 
               {/* Project Title */}
               <Field label="Project Title" required token={token}>
                 <input
                   className="nip-input-field"
-                  style={fieldStyle}
+                  style={{ ...fieldStyle }}
                   type="text" name="title" required
                   placeholder="e.g., SkillSwap"
-                  {...focusHandlers}
-                />
-              </Field>
-
-              {/* Short Description */}
-              <Field label="Short Description" required hint="one-liner" token={token}>
-                <input
-                  className="nip-input-field"
-                  style={fieldStyle}
-                  type="text" name="shortDescription" required
-                  placeholder="A marketplace for exchanging skills without money"
-                  {...focusHandlers}
+                  onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                  onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                 />
               </Field>
 
               {/* Category & Status Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 <Field label="Category" required token={token}>
-                  <select className="nip-select" style={selectStyle} name="category" required {...focusHandlers}>
+                  <select
+                    className="nip-select"
+                    style={selectStyle} name="category" required
+                    onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                    onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
+                  >
                     <option value="Education">Education</option>
                     <option value="Agriculture">Agriculture</option>
                     <option value="Technology">Technology</option>
@@ -296,9 +251,14 @@ export default function NewIdeaPage() {
                     <option value="Finance">Finance</option>
                   </select>
                 </Field>
-
+                
                 <Field label="Status" token={token}>
-                  <select className="nip-select" style={selectStyle} name="status" {...focusHandlers}>
+                  <select
+                    className="nip-select"
+                    style={selectStyle} name="status"
+                    onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                    onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
+                  >
                     <option value="New">New</option>
                     <option value="Trending">Trending</option>
                     <option value="Active">Active</option>
@@ -306,65 +266,16 @@ export default function NewIdeaPage() {
                 </Field>
               </div>
 
-              {/* Date Created */}
-              <Field label="Date Created" token={token}>
-                <input
-                  className="nip-input-field"
-                  style={fieldStyle}
-                  type="date" name="createdAt"
-                  defaultValue={todayISO}
-                  {...focusHandlers}
-                />
-              </Field>
-
-              {/* ── PROJECT DETAILS ── */}
-              <SectionDivider label="Project Details" />
-
               {/* Description */}
               <Field label="Description" required token={token}>
                 <textarea
                   className="nip-input-field"
                   style={textareaStyle} name="description" required
                   placeholder="Describe how your project works..."
-                  {...focusHandlers}
+                  onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                  onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                 />
               </Field>
-
-              {/* Target Audience */}
-              <Field label="Target Audience" required token={token}>
-                <textarea
-                  className="nip-input-field"
-                  style={textareaSmStyle} name="targetAudience" required
-                  placeholder="e.g., University students, freelancers, and career changers aged 18–35 in urban areas"
-                  {...focusHandlers}
-                />
-              </Field>
-
-              {/* ── PROBLEM & SOLUTION ── */}
-              <SectionDivider label="Problem & Solution" />
-
-              {/* Problem Statement */}
-              <Field label="Problem Statement" required token={token}>
-                <textarea
-                  className="nip-input-field"
-                  style={textareaSmStyle} name="problemStatement" required
-                  placeholder="What problem does your project solve? Why does it matter?"
-                  {...focusHandlers}
-                />
-              </Field>
-
-              {/* Proposed Solution */}
-              <Field label="Proposed Solution" required token={token}>
-                <textarea
-                  className="nip-input-field"
-                  style={textareaSmStyle} name="proposedSolution" required
-                  placeholder="How does your project address the problem? What's your approach?"
-                  {...focusHandlers}
-                />
-              </Field>
-
-              {/* ── TEAM & FUNDING ── */}
-              <SectionDivider label="Team & Funding" />
 
               {/* Founder & Funding Row */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
@@ -373,22 +284,23 @@ export default function NewIdeaPage() {
                     className="nip-input-field"
                     style={fieldStyle} type="text" name="founder" required
                     placeholder="Sarah Ahmed"
-                    {...focusHandlers}
+                    onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                    onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                   />
                 </Field>
-
+                
                 <Field label="Funding Amount" token={token}>
                   <input
                     className="nip-input-field"
                     style={fieldStyle} type="text" name="funding"
                     placeholder="e.g., $25,000"
-                    {...focusHandlers}
+                    onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                    onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                   />
                 </Field>
               </div>
 
-              {/* ── MEDIA ── */}
-              <SectionDivider label="Media & Tags" />
+              <div style={{ height: '1px', backgroundColor: token.divider, marginTop: '8px', marginBottom: '8px' }} />
 
               {/* Cover Image URL */}
               <Field label="Cover Image URL" token={token}>
@@ -398,13 +310,15 @@ export default function NewIdeaPage() {
                   placeholder="https://example.com/cover.png"
                   value={imageUrl}
                   onChange={e => setImageUrl(e.target.value)}
-                  {...focusHandlers}
+                  onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                  onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                 />
                 {imageUrl ? (
-                  <Image src={imageUrl}
-                            alt={title}
-                            width={300}
-                            height={300} />
+                  <Image
+                    src={imageUrl} alt="Cover preview"
+                    onError={e => { e.target.style.display = 'none'; }}
+                    style={{ marginTop: '12px', width: '100%', height: '160px', objectFit: 'cover', borderRadius: '12px', border: `1px solid ${token.cardBorder}` }}
+                  />
                 ) : (
                   <div style={{
                     marginTop: '12px', width: '100%', height: '80px', borderRadius: '12px',
@@ -426,15 +340,14 @@ export default function NewIdeaPage() {
                   placeholder="education, skills, community"
                   value={tags}
                   onChange={e => setTags(e.target.value)}
-                  {...focusHandlers}
+                  onFocus={e => { e.target.style.borderColor = token.fieldFocusBdr; e.target.style.boxShadow = `0 0 0 3px ${token.fieldFocusBdr}26`; }}
+                  onBlur={e =>  { e.target.style.borderColor = token.fieldBorder;   e.target.style.boxShadow = 'none'; }}
                 />
                 {tagList.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
                     {tagList.map((tag, i) => (
                       <span key={i} style={{
-                        fontSize: '12px', fontWeight: 500,
-                        paddingTop: '4px', paddingBottom: '4px', paddingLeft: '14px', paddingRight: '14px',
-                        borderRadius: '999px',
+                        fontSize: '12px', fontWeight: 500, paddingTop: '4px', paddingBottom: '4px', paddingLeft: '14px', paddingRight: '14px', borderRadius: '999px',
                         backgroundColor: dark ? 'rgba(201,169,110,0.15)' : 'rgba(29,111,168,0.08)',
                         color: dark ? '#c9a96e' : '#1d6fa8',
                         border: `1px solid ${dark ? 'rgba(201,169,110,0.3)' : 'rgba(29,111,168,0.25)'}`,
