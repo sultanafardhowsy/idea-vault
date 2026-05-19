@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import userAvatar from "@/assets/user.png";
 import logo from "@/assets/vault.png";
 import { useRouter } from 'next/navigation';
+import { Avatar } from '@heroui/react';
 
 const Navbar = () => {
   const { data: session, isPending } = authClient.useSession();
@@ -176,7 +177,7 @@ const Navbar = () => {
           {/* Desktop Nav Links */}
           <div className="hidden md:flex md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
             <Link href="/" className="nav-link">Home</Link>
-            <Link href="/all-animals" className="nav-link">Ideas</Link>
+            <Link href="/show-alldata" className="nav-link">Ideas</Link>
           </div>
 
           {/* Desktop User/Auth + Theme Toggle */}
@@ -204,17 +205,17 @@ const Navbar = () => {
               <span className="username-text text-sm md:text-base">Loading...</span>
             ) : user ? (
               <>
+              <div className="hidden md:flex items-start md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
+            <Link href="/add-idea" className="nav-link">Add Idea</Link>
+            
+          </div>
                 <h2 className="hidden lg:block font-semibold username-text text-sm lg:text-base">
                   {user.name}
                 </h2>
-                <Image
-                  src={user?.image || userAvatar}
-                  alt={user?.name || "User avatar"}
-                  width={40}
-                  height={40}
-                  className="rounded-full md:w-[40px] lg:w-[50px] object-cover ring-2 ring-white/30"
-                  referrerPolicy="no-referrer"
-                />
+                <li><Avatar>
+        <Avatar.Image alt="John Doe" src={user?.image} />
+        <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+      </Avatar></li>
                 <Link href="/profile" className="nav-link font-semibold text-sm md:text-base">
                   Profile
                 </Link>
@@ -275,7 +276,7 @@ const Navbar = () => {
             {/* Mobile Links */}
             <div className="flex flex-col gap-3 font-semibold text-sm sm:text-base">
               <Link href="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
-              <Link href="/all-animals" className="mobile-link" onClick={() => setMenuOpen(false)}>Ideas</Link>
+              <Link href="/show-alldata" className="mobile-link" onClick={() => setMenuOpen(false)}>Ideas</Link>
             </div>
 
             {/* Mobile User/Auth */}
@@ -284,14 +285,10 @@ const Navbar = () => {
             ) : user ? (
               <div className="flex flex-col gap-3 pt-3 border-t mobile-divider">
                 <div className="flex items-center gap-3">
-                  <Image
-                    src={user?.image || userAvatar}
-                    alt="User avatar"
-                    width={40}
-                    height={40}
-                    className="rounded-full ring-2 ring-white/30"
-                    referrerPolicy="no-referrer"
-                  />
+                  <li><Avatar>
+        <Avatar.Image alt="John Doe" src={user?.image} />
+        <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+      </Avatar></li>
                   <h2 className="font-semibold username-text text-sm sm:text-base">{user.name}</h2>
                 </div>
                 <Link href="/profile" className="mobile-link font-semibold" onClick={() => setMenuOpen(false)}>
