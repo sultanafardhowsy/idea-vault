@@ -1,23 +1,55 @@
 
-export default function IdeaCard({ ideas }) {
-  
-  // 2. Add an optional chaining fallback (allidea || {}) so it never crashes 
-  const tags = ideas?.tags || ['Networking', 'Barter', 'Community'];
+import Image from "next/image";
+import { LuMapPin } from "react-icons/lu";
+
+
+const IdeaCard = ({ idea }) => {
+
+  console.log(idea);
+  const {title,category, imageUrl, funding, founder, status,tags, description } = idea;
 
   return (
-    <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm hover:shadow-md border border-gray-100 overflow-hidden transition-all duration-300">
-      <div className="p-6">
-        {/* Render your title using the matching prop name */}
-        <h2 className="text-xl font-bold text-gray-900">{ideas?.title}</h2>
-        <p className="text-gray-600 text-sm mt-2">{ideas?.description}</p>
-        
-        {/* Render tags safely */}
-        <div className="flex gap-2 mt-4">
-          {tags.map((tag, idx) => (
-            <span key={idx} className="bg-gray-100 text-xs px-2 py-1 rounded">#{tag}</span>
-          ))}
+    <div className="border">
+     {imageUrl && imageUrl.trim() !== "" ? (
+  <Image
+    className="object-cover"
+    alt={title}
+    src={imageUrl}
+    height={200}
+    width={200}
+  />
+) : (
+  /* This renders when the URL is empty or null */
+  <div 
+    style={{ height: '400px', width: '400px' }} 
+    className="bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-400 font-medium"
+  >
+    🖼 No Image Available
+  </div>
+)}
+
+      <div className="p-2">
+        <div className="flex items-center gap-1">
+          <LuMapPin /> <span>{category}</span>
         </div>
+        <div className="flex justify-between">
+          <div>
+            <div>
+              <h2 className="text-xl font-bold">{founder}</h2>
+            </div>
+            <div className="flex gap-1 items-center">
+               {funding}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-bold">$ {status}</h3>
+          </div>
+        </div>
+       
       </div>
     </div>
   );
-}
+};
+
+export default IdeaCard;
