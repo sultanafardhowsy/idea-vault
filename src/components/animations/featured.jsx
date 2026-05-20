@@ -10,7 +10,7 @@ const FeaturedCard = ({ idealimit }) => {
 
   return (
     
-    <div className="border rounded-2xl overflow-hidden shadow-md bg-white dark:bg-zinc-900 flex flex-col h-full">
+    <div className="border rounded-none shadow-md bg-white dark:bg-zinc-900 flex flex-col justify-center h-full px-10">
      {imageUrl && imageUrl.trim() !== "" ? (
   <Image
     className="w-full h-52 object-cover"
@@ -41,7 +41,7 @@ const FeaturedCard = ({ idealimit }) => {
           </p>
         )}
         
-        <div className="mt-auto pt-4 flex justify-between items-end border-t">
+        <div className="mt-auto pt-4 flex justify-between items-center border-t">
           <div>
             <div className="text-sm font-semibold">{founder}</div>
             <div className="text-xs text-gray-500">Founder</div>

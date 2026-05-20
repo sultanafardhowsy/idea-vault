@@ -8,26 +8,48 @@ import userAvatar from "@/assets/user.png";
 import logo from "@/assets/vault.png";
 import { useRouter } from 'next/navigation';
 import { Avatar } from '@heroui/react';
+import { useTheme } from 'next-themes';
 
 const Navbar = () => {
   const { data: session, isPending } = authClient.useSession();
   const user = session?.user;
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
-  // Sync with system preference and <html class="dark"> (Tailwind dark mode)
   useEffect(() => {
-    const root = document.documentElement;
-    const checkDark = () => setIsDark(root.classList.contains('dark'));
-    checkDark();
-    const observer = new MutationObserver(checkDark);
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleOutsideClick = (event) => {
+      if (!event.target.closest('.user-menu-container')) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, [dropdownOpen]);
+
+  const getInitials = (name) => {
+    if (!name) return '';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
+  const initials = getInitials(user?.name);
+
+  const isDark = mounted ? resolvedTheme === 'dark' : false;
+
   const toggleTheme = () => {
-    document.documentElement.classList.toggle('dark');
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   };
 
   const handleLogout = async () => {
@@ -175,10 +197,15 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden md:flex md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
+          <div className="hidden md:flex items-center md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
             <Link href="/" className="nav-link">Home</Link>
             <Link href="/show-alldata" className="nav-link">Ideas</Link>
-            <Link href="/updatepage" className="nav-link">Update Idea</Link>
+            {user && (
+              <>
+                <Link href="/add-idea" className="nav-link">Add Idea</Link>
+                <Link href="/updatepage" className="nav-link">Update Idea</Link>
+              </>
+            )}
           </div>
 
           {/* Desktop User/Auth + Theme Toggle */}
@@ -205,28 +232,58 @@ const Navbar = () => {
             {isPending ? (
               <span className="username-text text-sm md:text-base">Loading...</span>
             ) : user ? (
-              <>
-              <div className="hidden md:flex items-start md:gap-4 lg:gap-8 font-semibold text-sm md:text-base lg:text-lg">
-            <Link href="/add-idea" className="nav-link">Add Idea</Link>
-            
-          </div>
-                <h2 className="hidden lg:block font-semibold username-text text-sm lg:text-base">
-                  {user.name}
-                </h2>
-                <li><Avatar>
-        <Avatar.Image alt="John Doe" src={user?.image} />
-        <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
-      </Avatar></li>
-                <Link href="/profile" className="nav-link font-semibold text-sm md:text-base">
-                  Profile
-                </Link>
+              <div className="relative user-menu-container flex items-center">
+                {/* Dropdown Trigger */}
                 <button
-                  className="glass-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm md:text-base"
-                  onClick={handleLogout}
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2 hover:opacity-85 focus:outline-none cursor-pointer"
                 >
-                  Log Out
+                  <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
+                    <Avatar.Image alt={user.name} src={user?.image} />
+                    <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+                  </Avatar>
+                  <span className="font-semibold text-sm md:text-base text-gray-900 dark:text-white">
+                    {initials}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                      dropdownOpen ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
                 </button>
-              </>
+
+                {/* Dropdown Menu */}
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-zinc-800 cursor-pointer"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleLogout();
+                      }}
+                    >
+                      Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex gap-2 lg:gap-3">
                 <Link
@@ -278,6 +335,12 @@ const Navbar = () => {
             <div className="flex flex-col gap-3 font-semibold text-sm sm:text-base">
               <Link href="/" className="mobile-link" onClick={() => setMenuOpen(false)}>Home</Link>
               <Link href="/show-alldata" className="mobile-link" onClick={() => setMenuOpen(false)}>Ideas</Link>
+              {user && (
+                <>
+                  <Link href="/add-idea" className="mobile-link" onClick={() => setMenuOpen(false)}>Add Idea</Link>
+                  <Link href="/updatepage" className="mobile-link" onClick={() => setMenuOpen(false)}>Update Idea</Link>
+                </>
+              )}
             </div>
 
             {/* Mobile User/Auth */}
@@ -286,10 +349,10 @@ const Navbar = () => {
             ) : user ? (
               <div className="flex flex-col gap-3 pt-3 border-t mobile-divider">
                 <div className="flex items-center gap-3">
-                  <li><Avatar>
-        <Avatar.Image alt="John Doe" src={user?.image} />
-        <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
-      </Avatar></li>
+                  <Avatar>
+                    <Avatar.Image alt={user.name} src={user?.image} />
+                    <Avatar.Fallback>{user.name.charAt(0)}</Avatar.Fallback>
+                  </Avatar>
                   <h2 className="font-semibold username-text text-sm sm:text-base">{user.name}</h2>
                 </div>
                 <Link href="/profile" className="mobile-link font-semibold" onClick={() => setMenuOpen(false)}>

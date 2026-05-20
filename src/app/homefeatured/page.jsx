@@ -15,18 +15,25 @@ async function getIdeas() {
 
 export default async function HomeFeatured() {
 
-  const ideas = await getIdeas();
+  const ideas = (await getIdeas()) || [];
 
   return (
  
-    <div className='max-w-7xl mx-auto border rounded-2xl shadow-md bg-white dark:bg-zinc-900 flex flex-col h-full'>
-           <h2 className="text-2xl font-bold mb-6 text-center pt-10">Featured Ideas</h2> 
-           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6'>
+    <div className="container mx-auto px-4 md:px-8 max-w-7xl">
+       <h2 className="text-3xl font-bold pb-12 text-center pt-10">Featured Ideas</h2> 
+          
+           <div className={`grid gap-10 mt-10 justify-center ${
+             ideas.length === 1
+               ? 'grid-cols-1 max-w-md mx-auto'
+               : ideas.length === 2
+                 ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'
+                 : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full'
+           }`}>
             {
-                ideas.map(idealimit =><FeaturedCard key={idealimit._id} idealimit={idealimit} />
-                    )
+                ideas.map(idealimit => <FeaturedCard key={idealimit._id} idealimit={idealimit} />)
             }
            </div>
-        </div>
+      </div>
+    
   );
 }

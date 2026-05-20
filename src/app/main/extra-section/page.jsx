@@ -7,7 +7,7 @@ import story1 from '@/assets/story1.png'
 const ExtraSection = () => {
     return (
         <div className='my-4 container mx-auto items-center mt-10'>
-            <h2 className='text-3xl pt-10 text-center font-bold'>Succcess Story</h2>
+            <h2 className='text-3xl pt-10 text-center font-bold mb-10'>Success Story</h2>
             {/* Marquee */}
       <Marquee speed={40} gradient={false}>
          <Image

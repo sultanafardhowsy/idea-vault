@@ -7,7 +7,7 @@ import ExtraSection from "./main/extra-section/page";
 export default function Home() {
   return (
     
-    <div className="mb-10">
+    <div className="mb-10 flex flex-col gap-16">
       <BannerPage />
       <HomeFeatured />
       <ExtraSection />
