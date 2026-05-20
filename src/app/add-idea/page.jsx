@@ -1,5 +1,6 @@
 'use client';
 
+import { authClient } from '@/lib/auth-client';
 import { title } from 'framer-motion/client';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
@@ -26,6 +27,11 @@ export default function NewIdeaPage() {
   /* Default date created to today */
   const todayISO = new Date().toISOString().split('T')[0];
 
+   const { data: session } = authClient.useSession();
+
+  const user = session?.user;
+  console.log(user);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
@@ -46,6 +52,9 @@ export default function NewIdeaPage() {
         ? formData.get('tags').split(',').map(t => t.trim()).filter(Boolean)
         : [],
       createdAt:          formData.get('createdAt') || todayISO,
+
+       email: user?.email,
+      
     };
     try {
       const res = await fetch('http://localhost:5000/allidea', {

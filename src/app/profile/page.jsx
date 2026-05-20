@@ -27,44 +27,46 @@ const ProfilePage = () => {
 
   const user = session.user;
 
-  return (
-    <div className="flex justify-center mt-10 px-4">
-      <div className="card w-full max-w-md bg-base-100 shadow-xl border">
-        <div className="card-body items-center text-center">
-          {/* Avatar */}
-          <div className="avatar mb-4">
-            <div className="w-24 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-              {user.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.name || "User"}
-                  width={96}
-                  height={96}
-                  className="rounded-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full bg-primary text-white text-3xl font-bold">
-                  {user.name?.charAt(0) || "U"}
+    return (
+        <div className='min-h-[85vh] w-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 transition-colors duration-300'>
+            <div className='w-full max-w-md p-6 sm:p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl dark:bg-slate-900/80 dark:border-blue-500/30 dark:shadow-[0_0_50px_rgba(59,130,246,0.2)] transition-all duration-300'>
+                <div className="flex flex-col items-center text-center">
+                    {/* Avatar */}
+                    <div className="avatar mb-6">
+                        <div className="w-28 h-28 rounded-full ring-4 ring-white/30 dark:ring-blue-500/40 ring-offset-4 ring-offset-blue-600 dark:ring-offset-slate-900 overflow-hidden shadow-lg">
+                            {user.image ? (
+                                <Image
+                                    src={user.image}
+                                    alt={user.name || "User"}
+                                    width={112}
+                                    height={112}
+                                    className="rounded-full object-cover w-full h-full"
+                                    referrerPolicy="no-referrer"
+                                />
+                            ) : (
+                                <div className="flex items-center justify-center w-full h-full bg-white/20 text-white text-4xl font-bold backdrop-blur-sm">
+                                    {user.name?.charAt(0).toUpperCase() || "U"}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* User Info */}
+                    <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
+                        {user.name || "Unknown User"}
+                    </h2>
+
+                    <p className="text-white/80 dark:text-blue-200/70 text-sm font-medium mb-8 bg-white/10 dark:bg-blue-950/30 px-3 py-1.5 rounded-full border border-white/10 dark:border-blue-500/10">
+                        {user.email || "No email available"}
+                    </p>
+
+                    <div className="w-full">
+                        <UpdateUserModal />
+                    </div>
                 </div>
-              )}
             </div>
-          </div>
-
-          {/* User Info */}
-          <h2 className="card-title text-2xl font-bold">
-            {user.name || "Unknown User"}
-          </h2>
-
-          <p className="text-gray-500 mb-4">
-            {user.email || "No email available"}
-          </p>
-
-          <UpdateUserModal />
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ProfilePage;

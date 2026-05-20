@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import CommentsSection from "@/components/CommentsSection";
 
 const ShowDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -29,20 +30,6 @@ const ShowDetailsPage = async ({ params }) => {
     tags,
     createdAt,
   } = details;
-
-  // Dummy comments
-  const comments = [
-    {
-      id: 1,
-      user: "Tamanna",
-      text: "This idea looks amazing!",
-    },
-    {
-      id: 2,
-      user: "Sultana",
-      text: "You should add more features.",
-    },
-  ];
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 bg-white dark:bg-gray-950 min-h-screen transition-colors duration-300">
@@ -114,58 +101,8 @@ const ShowDetailsPage = async ({ params }) => {
             </p>
           </div>
 
-          {/* Comments Section */}
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-md rounded-2xl p-6">
-            <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
-              Comments
-            </h2>
-
-            {/* Add Comment */}
-            <div className="mb-6">
-              <textarea
-                placeholder="Write your comment..."
-                className="w-full p-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none"
-                rows={4}
-              />
-
-              <button className="mt-3 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition">
-                Add Comment
-              </button>
-            </div>
-
-            {/* Comment List */}
-            <div className="space-y-4">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-gray-50 dark:bg-gray-800"
-                >
-                  <div className="flex justify-between items-start gap-4">
-                    <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white">
-                        {comment.user}
-                      </h4>
-
-                      <p className="text-gray-700 dark:text-gray-300 mt-2">
-                        {comment.text}
-                      </p>
-                    </div>
-
-                    {/* Buttons */}
-                    <div className="flex gap-2">
-                      <button className="px-3 py-1 text-sm rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white">
-                        Edit
-                      </button>
-
-                      <button className="px-3 py-1 text-sm rounded-lg bg-red-500 hover:bg-red-600 text-white">
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Comments Section — fully client-side with MongoDB persistence */}
+          <CommentsSection ideaId={_id} />
         </div>
 
         {/* Right Sidebar */}

@@ -9,77 +9,127 @@ import { GrGoogle } from 'react-icons/gr';
 import { toast } from "react-toastify";
 
 const LoginPage = () => {
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-    const { register, handleSubmit,formState:{errors} } = useForm()
+    const handleLoginFunc = async (data) => {
+        const { email, password } = data;
+        const { data: res, error } = await authClient.signIn.email({
+            email,
+            password,
+            rememberMe: true,
+            callbackURL: "/",
+        });
 
+        if (error) {
+            toast.error(error.message || "Login failed");
+        }
 
-const handleLoginFunc = async (data) => {
-  const { data: res, error } = await authClient.signIn.email({
-    email: data.email,
-    password: data.password,
-    rememberMe: true,
-    callbackURL: "/",
-  });
+        if (res) {
+            toast.success("Login successful 🎉");
+        }
+    };
 
-  if (error) {
-    toast.error(error.message || "Login failed");
-  }
-
-  if (res) {
-    toast.success("Login successful 🎉");
-  }
-};
- 
-    
-
-const handlGoogleSignIn = async () => {
-  // show toast BEFORE redirect
-  toast.loading("Redirecting to Google...");
-
-  await authClient.signIn.social({
-    provider: "google",
-    callbackURL: "/",
-  });
-};
-   
+    const handlGoogleSignIn = async () => {
+        toast.loading("Redirecting to Google...");
+        try {
+            await authClient.signIn.social({
+                provider: "google",
+                callbackURL: "/",
+            });
+        } catch (error) {
+            toast.error("Google sign-in failed ❌");
+        }
+    };
 
     return (
-        <div className='container mx-auto bg-[#C9A227] h-[60vh] flex justify-center items-center mt-15'>
-            <div className='p-4 rounded-xl bg-[#C9A227]'>
-                <h2 className='text-3xl  text-center font-bold mb-5'>Login your account</h2>
-                <form onSubmit={handleSubmit(handleLoginFunc)}>
-                    <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+        <div className='min-h-[85vh] w-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 transition-colors duration-300'>
+            <div className='w-full max-w-lg p-6 sm:p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl dark:bg-slate-900/80 dark:border-blue-500/30 dark:shadow-[0_0_50px_rgba(59,130,246,0.2)] transition-all duration-300'>
+                <h2 className='text-3xl text-center font-extrabold tracking-tight text-white mb-6'>
+                    Login your account
+                </h2>
+                
+                <form onSubmit={handleSubmit(handleLoginFunc)} className="space-y-5">
+                    <div className="space-y-4">
+                        <div>
+                            <label className="text-white/95 dark:text-blue-200/90 text-sm font-semibold tracking-wide mb-1.5 block">
+                                Email
+                            </label>
+                            <input 
+                                type="email" 
+                                className="w-full px-4 py-3 bg-white/15 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white focus:bg-white/25 dark:bg-blue-950/20 dark:border-blue-800/40 dark:text-blue-100 dark:placeholder-blue-300/30 dark:focus:ring-blue-500/40 dark:focus:border-blue-400 dark:focus:bg-blue-950/40 transition-all duration-200"
+                                placeholder="Email"
+                                {...register("email", { required: "Email is required" })} 
+                            />
+                            {errors.email && (
+                                <p className='text-rose-200 dark:text-rose-400 text-xs mt-1 font-medium'>
+                                    {errors.email.message}
+                                </p>
+                            )}
+                        </div>
 
-                        <label className="label">Email</label>
-                        <input type="email" className="input"
-                            placeholder="Email"
-                            {...register("email",{required: "Email is required"})} />
-                            {errors.email && <p className='text-red-500 text-sm'>{errors.email.message}</p>}
+                        <div>
+                            <div className="flex justify-between items-center mb-1.5">
+                                <label className="text-white/95 dark:text-blue-200/90 text-sm font-semibold tracking-wide block">
+                                    Password
+                                </label>
+                                <Link 
+                                    href="/forgot-password" 
+                                    className="text-xs text-white/80 dark:text-blue-300/80 hover:text-white dark:hover:text-blue-300 hover:underline font-semibold"
+                                >
+                                    Forgot Password?
+                                </Link>
+                            </div>
+                            <input 
+                                type="password" 
+                                className="w-full px-4 py-3 bg-white/15 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white focus:bg-white/25 dark:bg-blue-950/20 dark:border-blue-800/40 dark:text-blue-100 dark:placeholder-blue-300/30 dark:focus:ring-blue-500/40 dark:focus:border-blue-400 dark:focus:bg-blue-950/40 transition-all duration-200"
+                                placeholder="Password"
+                                {...register("password", { required: "Password is required" })} 
+                            />
+                            {errors.password && (
+                                <p className='text-rose-200 dark:text-rose-400 text-xs mt-1 font-medium'>
+                                    {errors.password.message}
+                                </p>
+                            )}
+                        </div>
+                    </div>
 
-                        <label className="label">Password</label>
-                        <input type="password" className="input"
-                            placeholder="Password"
-                            {...register("password",{required: "Password is required"})} />
+                    <div className='flex flex-col gap-4 mt-6'>
+                        {/* Primary Submit/Login Button */}
+                        <button 
+                            type="submit" 
+                            className="w-full py-3 px-4 rounded-xl font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 shadow-md cursor-pointer flex justify-center items-center gap-2 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700/80 dark:border-blue-500/20"
+                        >
+                            <Check className="w-5 h-5" />
+                            Submit
+                        </button>
 
-                            {errors.password && <p className='text-red-500 text-sm'>{errors.password.message}</p>}
+                        {/* Reset and Register Button Row */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <button 
+                                type="button" 
+                                onClick={() => reset()} 
+                                className="py-2.5 px-4 rounded-xl font-semibold bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer flex justify-center items-center gap-2 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700/80 dark:border-blue-500/20 shadow-md"
+                            >
+                                Reset
+                            </button>
+                            <Link 
+                                href="/register" 
+                                className="py-2.5 px-4 rounded-xl font-semibold bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 text-center cursor-pointer flex justify-center items-center gap-2 dark:bg-slate-800 dark:text-blue-300 dark:hover:bg-slate-700/80 dark:border-blue-500/20 shadow-md"
+                            >
+                                Register
+                            </Link>
+                        </div>
 
-                    </fieldset>
-                    
-                     <div className="flex gap-2 mt-4">
-          <button type="submit" className='btn btn-neutral'>
-            <Check />
-            Submit
-          </button>
-          <button type="reset" className='btn btn-neutral'>
-            Reset
-          </button>
-        </div>
+                        {/* Google Sign In */}
+                        <button 
+                            type="button" 
+                            onClick={handlGoogleSignIn}  
+                            className="w-full flex justify-center items-center gap-2 py-3 px-4 rounded-xl font-bold bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer shadow-lg dark:bg-slate-800 dark:border-blue-500/20 dark:text-white dark:hover:bg-slate-700"
+                        >
+                            <GrGoogle className="text-lg" /> Sign In With Google
+                        </button>
+                    </div>
                 </form>
-                <p className="text-center">Or</p>
-
-      <button onClick={handlGoogleSignIn}  className="btn btn-neutral"><GrGoogle/> Sign In With Google</button>
-    
-                <p className='mt-5'>Don't have an account? <Link href={"/register"} className='text-blue-700'>Register</Link></p>
             </div>
         </div>
     );
