@@ -22,7 +22,7 @@ export async function GET(request) {
       .toArray();
 
     // Serialize ObjectId → plain string so the client can use it directly
-    const serialized = comments.map((c) => ({
+    const serialized = comments?.map((c) => ({
       ...c,
       _id: c._id.toString(),
     }));

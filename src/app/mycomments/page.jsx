@@ -19,13 +19,17 @@ export default function MyCommentsPage() {
   const fetchMyComments = async () => {
     setLoading(true);
     try {
+      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+      if (!serverUrl) return;
       const res = await fetch(
-        `http://localhost:5000/mycomments?userId=${encodeURIComponent(session.user.id)}`
+        `${serverUrl}/mycomments?userId=${encodeURIComponent(session.user.id)}`
       );
+      if (!res.ok) throw new Error("Failed to fetch comments");
       const data = await res.json();
-      setComments(data);
+      setComments(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
+      setComments([]);
     } finally {
       setLoading(false);
     }
@@ -36,7 +40,7 @@ export default function MyCommentsPage() {
     if (!confirm("Are you sure you want to delete this comment?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/comments/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
         method: 'DELETE',
       });
 
@@ -60,14 +64,14 @@ export default function MyCommentsPage() {
     if (!editText.trim()) return alert("Comment cannot be empty");
 
     try {
-      const res = await fetch(`http://localhost:5000/comments/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: editText }),
       });
 
       if (res.ok) {
-        setComments(comments.map(c => 
+        setComments(comments?.map(c => 
           c._id === id ? { ...c, text: editText, updatedAt: new Date() } : c
         ));
         setEditingId(null);
@@ -132,7 +136,7 @@ return (
           </div>
         ) : (
           <div className="space-y-6">
-            {comments.map((comment) => (
+            {comments?.map((comment) => (
               <div
                 key={comment._id}
                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all"

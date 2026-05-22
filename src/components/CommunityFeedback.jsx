@@ -6,9 +6,18 @@ export default function CommunityFeedback() {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/comments6")
-      .then((res) => res.json())
-      .then((data) => setComments(data));
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    if (!serverUrl) return;
+    fetch(`${serverUrl}/comments6`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Fetch failed");
+        return res.json();
+      })
+      .then((data) => setComments(Array.isArray(data) ? data : []))
+      .catch((err) => {
+        console.error("Error fetching community feedback:", err);
+        setComments([]);
+      });
   }, []);
 
   return (
@@ -22,7 +31,7 @@ export default function CommunityFeedback() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           
-          {comments.map((item) => (
+          {comments?.map((item) => (
             <div
               key={item._id}
               className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md"

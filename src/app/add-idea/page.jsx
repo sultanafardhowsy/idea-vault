@@ -49,7 +49,7 @@ export default function NewIdeaPage() {
       funding:            formData.get('funding') || '$0',
       imageUrl:           formData.get('imageUrl') || '',
       tags:               formData.get('tags')
-        ? formData.get('tags').split(',').map(t => t.trim()).filter(Boolean)
+        ? formData.get('tags').split(',')?.map(t => t.trim()).filter(Boolean)
         : [],
       createdAt:          formData.get('createdAt') || todayISO,
 
@@ -57,7 +57,7 @@ export default function NewIdeaPage() {
       
     };
     try {
-      const res = await fetch('http://localhost:5000/allidea', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/allidea`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export default function NewIdeaPage() {
     }
   }
 
-  const tagList = tags.split(',').map(t => t.trim()).filter(Boolean);
+  const tagList = tags.split(',')?.map(t => t.trim()).filter(Boolean);
 
   /* ── Fully Harmonized Design Tokens ── */
   const token = {
@@ -440,7 +440,7 @@ export default function NewIdeaPage() {
                 />
                 {tagList.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
-                    {tagList.map((tag, i) => (
+                    {tagList?.map((tag, i) => (
                       <span key={i} style={{
                         fontSize: '12px', fontWeight: 500,
                         paddingTop: '4px', paddingBottom: '4px', paddingLeft: '14px', paddingRight: '14px',

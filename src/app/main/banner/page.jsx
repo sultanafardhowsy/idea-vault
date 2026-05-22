@@ -428,7 +428,7 @@ export default function HeroPage() {
                 { num: '12.4k+', label: 'Ideas Deposited' },
                 { num: '45k+',   label: 'Active Builders' },
                 { num: '62%',    label: 'Avg. Pivot Success' },
-              ].map((s) => (
+              ]?.map((s) => (
                 <div key={s.label}>
                   <p className="hero-stat-num">{s.num}</p>
                   <p className="hero-stat-label">{s.label}</p>

@@ -18,7 +18,7 @@ const ShowDetailsPage = async ({ params }) => {
     token = null;
   }
 
-  const res = await fetch(`http://localhost:5000/showalldata/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${id}`, {
     headers: {
       ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
@@ -194,7 +194,7 @@ const ShowDetailsPage = async ({ params }) => {
             </h2>
 
             <div className="flex flex-wrap gap-2">
-              {tags?.map((tag, index) => (
+              {Array.isArray(tags) && tags.map((tag, index) => (
                 <span
                   key={index}
                   className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full text-sm"

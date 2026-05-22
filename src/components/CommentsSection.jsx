@@ -5,7 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
-const BASE = "http://localhost:5000";
+const BASE = `${process.env.NEXT_PUBLIC_SERVER_URL}`;
 
 export default function CommentsSection({ ideaId,title }) {
   const { data: session } = authClient.useSession();
@@ -80,7 +80,7 @@ export default function CommentsSection({ ideaId,title }) {
       });
       if (res.ok) {
         setComments((prev) =>
-          prev.map((c) =>
+          prev?.map((c) =>
             c._id === commentId ? { ...c, text: editText.trim() } : c
           )
         );
@@ -212,7 +212,7 @@ export default function CommentsSection({ ideaId,title }) {
         </div>
       ) : (
         <div className="space-y-4">
-          {comments.map((comment) => {
+          {comments?.map((comment) => {
             const isOwner = user && user.id === comment.userId;
             const isEditing = editingId === comment._id;
             const isDeleting = deletingId === comment._id;

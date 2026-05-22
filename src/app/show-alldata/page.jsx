@@ -35,7 +35,7 @@ const IdeaPage = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/allideas?search=${encodeURIComponent(debouncedSearch)}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/allideas?search=${encodeURIComponent(debouncedSearch)}`
         );
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
@@ -83,7 +83,7 @@ const IdeaPage = () => {
         {/* Category pills */}
         <div className="flex flex-wrap items-center gap-2">
           <FiFilter className="text-gray-400 text-sm flex-shrink-0" />
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES?.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -141,7 +141,7 @@ const IdeaPage = () => {
             </p>
           </div>
         ) : (
-          displayedIdeas.map((idea) => (
+          displayedIdeas?.map((idea) => (
             <IdeaCard key={idea._id} idea={idea} />
           ))
         )}

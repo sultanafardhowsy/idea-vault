@@ -4,18 +4,35 @@ import FeaturedCard from "@/components/animations/featured";
 
 
 async function getIdeas() {
-  const res = await fetch('http://localhost:5000/ideas', {
-    cache: 'no-store',
-  });
+  try {
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    if (!serverUrl) {
+      console.warn("NEXT_PUBLIC_SERVER_URL is not defined");
+      return [];
+    }
+    const res = await fetch(`${serverUrl}/ideas`, {
+      cache: 'no-store',
+    });
 
-  const data = await res.json();
+    if (!res.ok) {
+      console.error(`Fetch failed with status ${res.status}`);
+      return [];
+    }
 
-  return data;
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    if (error && (error.digest === 'DYNAMIC_SERVER_USAGE' || error.message?.includes('Dynamic server usage'))) {
+      throw error;
+    }
+    console.error("Error fetching ideas:", error);
+    return [];
+  }
 }
 
 export default async function HomeFeatured() {
-
-  const ideas = (await getIdeas()) || [];
+  const ideas = await getIdeas();
+  const ideasArray = Array.isArray(ideas) ? ideas : [];
 
   return (
  
@@ -23,14 +40,14 @@ export default async function HomeFeatured() {
        <h2 className="text-3xl font-bold pb-12 text-center pt-10">Featured Ideas</h2> 
           
            <div className={`grid gap-10 mt-10 justify-center ${
-             ideas.length === 1
+             ideasArray.length === 1
                ? 'grid-cols-1 max-w-md mx-auto'
-               : ideas.length === 2
+               : ideasArray.length === 2
                  ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'
                  : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 w-full'
            }`}>
             {
-                ideas.map(idealimit => <FeaturedCard key={idealimit._id} idealimit={idealimit} />)
+                ideasArray.map(idealimit => <FeaturedCard key={idealimit._id} idealimit={idealimit} />)
             }
            </div>
       </div>

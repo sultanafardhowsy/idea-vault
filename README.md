@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 💡 IdeaVault
 
-## Getting Started
+IdeaVault is a dynamic, web-based platform designed for innovators, entrepreneurs, and visionaries to share startup concepts, receive community validation, and refine ideas collectively. Moving away from traditional scheduling systems, IdeaVault focuses entirely on open crowdsourced innovation, feedback loops, and trend discovery.
 
-First, run the development server:
+🌐 [Live Site URL](YOUR_LIVE_SITE_URL_HERE)
 
+---
+
+## ✨ Features
+
+*   **Secure Authentication & Seamless State Persistence:** Features complete JWT-backed email/password and Google OAuth workflows. Custom private route wrappers ensure that logged-in users are **never** booted back to the login screen upon refreshing a private route.
+*   **Granular Advanced Search & Filtering:** Allows users to easily sift through concepts with case-insensitive title search via MongoDB `$regex` alongside swift category dropdown filtering.
+*   **Fully Real-Time Interaction System:** Includes an interactive, private-route protected comment ecosystem where authors can create, instantly edit, or delete their own feedback with clear user attribution and precise timestamps.
+*   **Personal Dashboard (Full CRUD Capabilities):** A robust "My Ideas" control hub allowing creators to look over their submissions and perform fast inline updates using modals or safely clear entries with confirmation dialogs.
+*   **Global Light/Dark Mode Synergy:** Built-in seamless UI theme toggle accessible from the navigation bar, injecting uniform system-wide typography, equal card scaling, and modern aesthetics (featuring updated X branding) across mobile, tablet, and desktop viewports.
+
+---
+
+## 🛠️ Technology Stack
+
+### Client-Side
+*   **Framework:** React (Vite)
+*   **Styling:** Tailwind CSS / [ShadCN / Flowbite / Material UI - *Keep your chosen one*]
+*   **Icons:** Lucide React / React Icons (Featuring updated X platform branding)
+*   **State Management & Routing:** React Router DOM
+*   **Feedback System:** React Hot Toast / React Toastify (Zero default browser alerts used)
+
+### Server-Side
+*   **Runtime Environment:** Node.js
+*   **Framework:** Express.js
+*   **Database:** MongoDB Atlas (Utilizing advanced query aggregations like `$limit`, `$regex`, and sorting)
+*   **Security:** JSON Web Tokens (JWT) for secure state persistence & cookie-based or header-based route protection
+
+---
+
+## 🚀 Key Client-Side Dynamic Routes
+
+| Route | Accessibility | Description |
+| :--- | :--- | :--- |
+| `/` | Public | Features a 3-slide innovation banner, custom sections, and top 6 trending ideas. |
+| `/ideas` | Public | 3-column responsive catalog equipped with title search and category filter. |
+| `/idea/:id` | **Private** | Detailed specification breakdown containing the reactive comment engine. |
+| `/add-idea` | **Private** | Multipart form schema evaluating problem, solution, budget, and target audience. |
+| `/my-ideas` | **Private** | Personal inventory featuring modal-driven update and delete flows. |
+| `/my-interactions` | **Private** | Complete ledger displaying ideas you have validated and commented on. |
+| `*` | Public | Custom 404 error page matching global application styling guidelines. |
+
+---
+
+## 💻 Local Installation & Setup
+
+Follow these steps to run the client application locally on your computer:
+
+1. **Clone the repository:**
+   
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   git clone [https://github.com/YOUR_GITHUB_USERNAME/ideavault-client.git](https://github.com/YOUR_GITHUB_USERNAME/ideavault-client.git)
+   cd ideavault-client

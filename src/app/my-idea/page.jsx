@@ -28,17 +28,20 @@ export default function MyIdeasPage() {
     setError(null);
 
     try {
+      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+      if (!serverUrl) return;
       const response = await fetch(
-        `http://localhost:5000/ideas-by-email?email=${session.user.email}`
+        `${serverUrl}/ideas-by-email?email=${session.user.email}`
       );
 
       if (!response.ok) throw new Error('Failed to fetch ideas');
 
       const data = await response.json();
-      setIdeas(data);
+      setIdeas(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error(error);
       setError('Failed to load ideas');
+      setIdeas([]);
     } finally {
       setLoadingIdeas(false);
     }
@@ -65,7 +68,7 @@ export default function MyIdeasPage() {
   // ✅ Update Idea
   const handleUpdate = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/ideas/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -87,7 +90,7 @@ export default function MyIdeasPage() {
     if (!confirm('Delete this idea permanently?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/ideas/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${id}`, {
         method: 'DELETE'
       });
 
@@ -142,7 +145,7 @@ export default function MyIdeasPage() {
       ) : (
         <div className="grid gap-6 grid-cols-1">
 
-          {ideas.map((idea) => (
+          {ideas?.map((idea) => (
             <div
               key={idea._id}
               className="flex flex-col md:flex-row bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden"

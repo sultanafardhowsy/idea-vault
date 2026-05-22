@@ -20,7 +20,7 @@ const RegisterPage = () => {
             email,
             password,
             image: photo,
-            callbackURL: "/login",
+            callbackURL: "/",
         });
 
         if (error) {
@@ -30,10 +30,10 @@ const RegisterPage = () => {
 
         if (res) {
             toast("Sign-up successful");
-            await authClient.signOut();
+            // await authClient.signOut();
 
-            toast.success("Logged out successfully 👋");
-            router.push("/login");
+            // toast.success("Logged out successfully 👋");
+            router.push("/");
         }
     };
 

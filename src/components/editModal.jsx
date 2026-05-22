@@ -29,7 +29,7 @@ export function EditModal({destination}) {
         console.log(destination)
 
 
-        const res = await fetch(`http://localhost:5000/showalldata/${_id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${_id}`, {
             method: 'PATCH',
             headers: {
                 'content-type': 'application/json'
