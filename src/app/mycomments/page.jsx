@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from '@/lib/auth-client';
+import { authClient, useSession } from '@/lib/auth-client';
 
 export default function MyCommentsPage() {
-  const { data: session } = useSession();
+  //const { data: session } = useSession();
+  const { data: session, isPending } = authClient.useSession();
   
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -78,18 +79,36 @@ export default function MyCommentsPage() {
     }
   };
 
-  if (loading) {
-    return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Loading...</div>;
+//   if (loading) {
+//     return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Loading...</div>;
+//   }
+
+
+// // Optional: Fallback if there's no active session yet
+// if (!session?.user) {
+//   return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Please sign in to view your comments.</div>;
+// }
+
+
+  if (isPending) {
+    return (
+      <div className="flex justify-center mt-10">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
   }
 
-  if (loading) {
-  return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Loading...</div>;
-}
+  if (!session?.user) {
+    return (
+      <div className="flex justify-center mt-10">
+        <p className="text-lg font-semibold text-red-500">
+          Please log in first.
+        </p>
+      </div>
+    );
+  }
 
-// Optional: Fallback if there's no active session yet
-if (!session?.user) {
-  return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Please sign in to view your comments.</div>;
-}
+  const user = session.user;
 
 return (
   <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-12">

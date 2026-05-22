@@ -17,13 +17,14 @@ export default function Footer({ onContactClick }) {
               style={{ color: 'rgb(var(--foreground-rgb))' }}
               className="text-2xl font-bold"
             >
-              Sultana Fardhowsy
+              IdeaVault
             </h3>
             <p 
               style={{ color: 'rgb(var(--foreground-rgb))', opacity: 0.7 }}
               className="text-sm leading-relaxed max-w-xs"
             >
-              Full Stack Developer passionate about creating beautiful and functional web experiences.
+             A place for every idea to grow and shine.
+Create, collaborate, and change the future.
             </p>
           </div>
 
@@ -39,15 +40,15 @@ export default function Footer({ onContactClick }) {
               style={{ color: 'rgb(var(--foreground-rgb))', opacity: 0.8 }}
               className="space-y-2 text-sm"
             >
-              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="#about">About</a></li>
-              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="#projects">Projects</a></li>
-              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="#services">Services</a></li>
+              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="/show-alldata">All Ideas</a></li>
+              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="/add-idea">Add Idea</a></li>
+              <li><a className="hover:text-slate-900 dark:hover:text-white transition-colors" href="/my-idea">My Idea</a></li>
               <li>
                 <button 
                   onClick={onContactClick}
                   className="hover:text-slate-900 dark:hover:text-white transition-colors text-left"
                 >
-                  Contact
+                  Contact: 01712345678
                 </button>
               </li>
             </ul>

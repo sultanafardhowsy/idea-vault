@@ -12,7 +12,8 @@ export default function CommunityFeedback() {
   }, []);
 
   return (
-    <section className="py-16 px-4 bg-gray-100 dark:bg-gray-900">
+    // <section className=" py-16 px-4 bg-gray-100 dark:bg-gray-900">
+    <div className='min-h-auto w-7xl mx-auto flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 transition-colors duration-300'>
       <div className="max-w-6xl mx-auto">
         
         <h2 className="text-4xl font-bold text-center mb-10 text-gray-800 dark:text-white">
@@ -47,6 +48,7 @@ export default function CommunityFeedback() {
           
         </div>
       </div>
-    </section>
+      </div>
+    // </section>
   );
 }

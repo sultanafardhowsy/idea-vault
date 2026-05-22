@@ -1,13 +1,21 @@
 import Image from "next/image";
 import React from "react";
 import CommentsSection from "@/components/CommentsSection";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 const ShowDetailsPage = async ({ params }) => {
   const { id } = await params;
 
+  const {token} = await auth.api.getToken({
+    headers: await headers()
+  });
+
+  console.log(token);
+
   const res = await fetch(`http://localhost:5000/showalldata/${id}`, {
     headers: {
-      authorization: "logged in",
+      authorization: `Bearer ${token}`,
     },
     cache: "no-store",
   });
@@ -36,7 +44,7 @@ const ShowDetailsPage = async ({ params }) => {
       {/* Hero Image */}
       <div className="relative w-full h-[400px] rounded-2xl overflow-hidden mb-8 shadow-lg">
         <Image
-          src={imageUrl || "/placeholder.jpg"}
+          src={imageUrl}
           alt={title}
           fill
           className="object-cover"
