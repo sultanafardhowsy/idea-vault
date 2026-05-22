@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
 const BASE = "http://localhost:5000";
 
@@ -57,9 +58,13 @@ export default function CommentsSection({ ideaId,title }) {
         const newComment = await res.json();
         setComments((prev) => [newComment, ...prev]);
         setText("");
+        toast.success("Comment posted! 💬");
+      } else {
+        toast.error("Failed to post comment.");
       }
     } catch (err) {
       console.error("Failed to add comment", err);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -81,9 +86,13 @@ export default function CommentsSection({ ideaId,title }) {
         );
         setEditingId(null);
         setEditText("");
+        toast.success("Comment updated ✅");
+      } else {
+        toast.error("Failed to update comment.");
       }
     } catch (err) {
       console.error("Failed to update comment", err);
+      toast.error("Something went wrong. Please try again.");
     }
   }
 
@@ -95,9 +104,13 @@ export default function CommentsSection({ ideaId,title }) {
       });
       if (res.ok) {
         setComments((prev) => prev.filter((c) => c._id !== commentId));
+        toast.success("Comment deleted 🗑️");
+      } else {
+        toast.error("Failed to delete comment.");
       }
     } catch (err) {
       console.error("Failed to delete comment", err);
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setDeletingId(null);
     }

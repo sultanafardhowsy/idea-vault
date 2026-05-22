@@ -1,9 +1,9 @@
 'use client';
 
 import { authClient } from '@/lib/auth-client';
-import { title } from 'framer-motion/client';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 /* ── Read dark mode from <html class="dark"> ── */
 function useIsDark() {
@@ -63,9 +63,11 @@ export default function NewIdeaPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Failed');
-      window.location.href = '/';
+      toast.success('🎉 Idea published successfully!');
+      setTimeout(() => { window.location.href = '/'; }, 1200);
     } catch (err) {
       console.error('Submission failed:', err);
+      toast.error('❌ Failed to publish idea. Please try again.');
       setSubmitting(false);
     }
   }
@@ -410,10 +412,9 @@ export default function NewIdeaPage() {
                   {...focusHandlers}
                 />
                 {imageUrl ? (
-                  <Image src={imageUrl}
-                            alt={title}
-                            width={300}
-                            height={300} />
+                  <img src={imageUrl}
+                       alt="Project preview"
+                       style={{ width: '100%', maxWidth: '300px', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
                 ) : (
                   <div style={{
                     marginTop: '12px', width: '100%', height: '80px', borderRadius: '12px',

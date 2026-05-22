@@ -8,7 +8,7 @@ import userAvatar from "@/assets/user.png";
 import logo from "@/assets/vault.png";
 import { useRouter } from 'next/navigation';
 import { Avatar } from '@heroui/react';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@teispace/next-themes';
 
 const Navbar = () => {
   const { data: session, isPending } = authClient.useSession();

@@ -96,7 +96,7 @@ Create, collaborate, and change the future.
           </div>
         </div>
         <div className="mt-16 pt-8 border-t border-black/5 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 dark:text-slate-600 text-xs">© 2024 Sultana Fardhowsy. All rights reserved.</p>
+          <p className="text-slate-500 dark:text-slate-600 text-xs">© 2026 IdeaVault. All rights reserved.</p>
           <p className="text-slate-500 dark:text-slate-600 text-xs">Built with passion & Next.js/Tailwind</p>
         </div>
       </div>

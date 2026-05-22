@@ -1,7 +1,7 @@
 "use client";
 
 import { RouterProvider } from "@heroui/react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "@teispace/next-themes";
 import { useRouter } from "next/navigation";
 
 export function Providers({ children }) {
@@ -9,7 +9,10 @@ export function Providers({ children }) {
 
   return (
     <RouterProvider navigate={router.push}>
-      <NextThemesProvider attribute="class" defaultTheme="dark">
+      <NextThemesProvider
+        attribute="class"
+        defaultTheme="dark"
+      >
         {children}
       </NextThemesProvider>
     </RouterProvider>
