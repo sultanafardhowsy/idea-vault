@@ -102,7 +102,7 @@ const ShowDetailsPage = async ({ params }) => {
           </div>
 
           {/* Comments Section — fully client-side with MongoDB persistence */}
-          <CommentsSection ideaId={_id} />
+          <CommentsSection ideaId={_id} title={title}/>
         </div>
 
         {/* Right Sidebar */}

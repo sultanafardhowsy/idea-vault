@@ -1,12 +1,24 @@
+"use client"
 
-
+import { Button } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify"; 
 import Image from "next/image";
+import { Router } from "next/router";
+import { FiExternalLink } from "react-icons/fi";
 import { LuMapPin } from "react-icons/lu";
 
 
 const FeaturedCard = ({ idealimit }) => {
-
-  const {title,category, imageUrl, funding, founder, status,tags, description } = idealimit;
+const router = useRouter();
+  const {_id,title,category, imageUrl, funding, founder, status,tags, description } = idealimit;
+  const handleViewDetails = () => {
+    toast.success("Opening idea details!", {
+      position: "top-right",
+      autoClose: 2000,
+    });
+    router.push(`/show-alldata/${_id}`);
+  };
 
   return (
     
@@ -51,9 +63,19 @@ const FeaturedCard = ({ idealimit }) => {
             <div className="text-xs text-gray-500">Funding</div>
           </div>
         </div>
-        <div className="mt-2 text-right">
-            <span className="text-sm font-semibold text-green-600">{status}</span>
+        <div className="flex justify-between items-center mt-2 text-right gap-2">
+           <span className="text-sm font-semibold text-green-600">{status}</span>
+           <Button
+      onClick={handleViewDetails}
+      variant="ghost"
+      className=" btn bg-cyan-500 mt-1 text-white"
+    >
+      {/* <FiExternalLink className="mr-2" /> */}
+      View Details
+    </Button>
+           
         </div>
+       
       </div>
     </div>
   );

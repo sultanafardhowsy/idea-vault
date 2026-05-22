@@ -26,6 +26,9 @@ export default function CommunityFeedback() {
               key={item._id}
               className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md"
             >
+              <h4 className="font-semibold text-gray-900 dark:text-white">
+                  {item.title}
+                </h4>
               <p className="text-gray-700 dark:text-gray-300 italic">
                 "{item.text}"
               </p>

@@ -6,7 +6,7 @@ import Image from "next/image";
 
 const BASE = "http://localhost:5000";
 
-export default function CommentsSection({ ideaId }) {
+export default function CommentsSection({ ideaId,title }) {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
@@ -20,7 +20,7 @@ export default function CommentsSection({ ideaId }) {
 
   useEffect(() => {
     fetchComments();
-  }, [ideaId]);
+  },[ideaId, title || ""]);
 
   useEffect(() => {
     if (editingId && editRef.current) editRef.current.focus();
@@ -46,10 +46,11 @@ export default function CommentsSection({ ideaId }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ideaId,
+          title,
           text,
           userId: user.id,
           userName: user.name,
-          userImage: user.image ?? null,
+         
         }),
       });
       if (res.ok) {
