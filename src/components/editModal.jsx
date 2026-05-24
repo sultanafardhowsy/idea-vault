@@ -16,7 +16,7 @@ import {
 
 import { BiEdit } from "react-icons/bi";
 
-export function EditModal({destination}) {
+export function EditModal({idea}) {
  console.log(idea);
   const {_id,title,category, imageUrl, funding, founder, status,tags, description } = idea;
 
