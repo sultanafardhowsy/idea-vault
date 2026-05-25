@@ -338,7 +338,6 @@ const Navbar = () => {
               {user && (
                 <>
                   <Link href="/add-idea" className="mobile-link" onClick={() => setMenuOpen(false)}>Add Idea</Link>
-                  <Link href="/updatepage" className="mobile-link" onClick={() => setMenuOpen(false)}>Update Idea</Link>
                   <Link href="/my-idea" className="nav-link">My Idea</Link>
                 <Link href="/mycomments" className="nav-link">My Comments</Link>
                 </>

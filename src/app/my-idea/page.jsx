@@ -7,18 +7,33 @@ import EditIdeaModal from '@/components/myideamodal';
 export default function MyIdeasPage() {
   const { data: session, isPending } = authClient.useSession();
 
+  const [mounted, setMounted] = useState(false);
   const [ideas, setIdeas] = useState([]);
   const [loadingIdeas, setLoadingIdeas] = useState(true);
   const [error, setError] = useState(null);
   const [editingId, setEditingId] = useState(null);
 
+  // ── Mount guard — server & client must agree on first render ──
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const fetchMyIdeas = async () => {
     if (!session?.user?.email) return;
     setLoadingIdeas(true);
     setError(null);
+
+    const { data: tokenData } = await authClient.token();
+
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas-by-email?email=${session.user.email}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas-by-email?email=${session.user.email}`,
+        {
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${tokenData?.token}`,
+          },
+        }
       );
       if (!res.ok) throw new Error('Failed to fetch ideas');
       const data = await res.json();
@@ -49,7 +64,17 @@ export default function MyIdeasPage() {
     }
   };
 
-  // ─── Always render <main> so server & client agree on the root element ───
+  // ── Before mount: render static shell that matches SSR exactly ──
+  if (!mounted) {
+    return (
+      <main className="p-4 sm:p-6 max-w-4xl mx-auto min-h-screen bg-white">
+        <div className="flex items-center justify-center py-20">
+          <span className="text-gray-400 text-sm animate-pulse">Loading…</span>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="p-4 sm:p-6 max-w-4xl mx-auto min-h-screen bg-white">
 

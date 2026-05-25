@@ -9,6 +9,9 @@ import { GrGoogle } from 'react-icons/gr';
 import { toast } from "react-toastify";
 
 const LoginPage = () => {
+
+
+    
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
     const handleLoginFunc = async (data) => {

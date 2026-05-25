@@ -17,3 +17,6 @@ export async function proxy(request) {
 export const config = {
   matcher: ["/show-alldata/:path","/mycomments","/profile","/add-idea","/my-idea"],
 };
+
+
+

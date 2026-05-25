@@ -2,9 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
+import { authClient } from '@/lib/auth-client';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
+  const [mounted, setMounted] = useState(false);
+
   const [form, setForm] = useState({
     title: '',
     category: '',
@@ -12,23 +15,42 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
     description: '',
     imageUrl: '',
   });
+
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
 
-  // ─── Fetch existing idea data ─────────────────────────────────────────────
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ── Fetch existing idea ──
+  useEffect(() => {
+    if (!mounted || !ideaId) return;
+
     const fetchIdea = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`,
-          { credentials: 'include' }
-        );
+        // ✅ Get auth token
+        const { data: tokenData } = await authClient.token();
 
-        if (!res.ok) throw new Error('Failed to fetch idea');
+        const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`;
+
+        const res = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${tokenData?.token}`,
+          },
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `Server error ${res.status}`);
+        }
 
         const data = await res.json();
 
@@ -40,68 +62,81 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
           imageUrl: data.imageUrl || '',
         });
       } catch (err) {
-        setError(err.message);
-        toast.error(err.message || 'Failed to load idea');
+        console.error(err);
+        const msg = err.message || 'Failed to load idea';
+        setError(msg);
+        toast.error(msg);
       } finally {
         setLoading(false);
       }
     };
 
-    if (ideaId) fetchIdea();
-  }, [ideaId]);
+    fetchIdea();
+  }, [ideaId, mounted]);
 
-  // ─── ESC key closes modal ─────────────────────────────────────────────────
+  // ── ESC key closes modal ──
   const handleKeyDown = useCallback(
-    (e) => { if (e.key === 'Escape') onClose(); },
+    (e) => {
+      if (e.key === 'Escape') onClose();
+    },
     [onClose]
   );
 
+  // ── Lock body scroll ──
   useEffect(() => {
+    if (!mounted) return;
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
-  }, [handleKeyDown]);
+  }, [handleKeyDown, mounted]);
 
-  // ─── Click outside backdrop to close ─────────────────────────────────────
+  // ── Backdrop click ──
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
 
-  // ─── Field change helper ──────────────────────────────────────────────────
+  // ── Field change ──
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ─── Submit update ────────────────────────────────────────────────────────
+  // ── Update idea ──
   const handleUpdate = async () => {
     try {
       setUpdating(true);
       setError(null);
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(form),
-        }
-      );
+      // ✅ Get auth token for PATCH too
+      const { data: tokenData } = await authClient.token();
+
+      const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`;
+
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${tokenData?.token}`,
+        },
+        credentials: 'include',
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || 'Failed to update idea');
+        throw new Error(data.message || 'Failed to update idea');
       }
 
       toast.success('Idea updated successfully!');
       setTimeout(() => {
-        onSuccess();
-        onClose();
+        onSuccess?.();
+        onClose?.();
       }, 1200);
     } catch (err) {
+      console.error(err);
       const msg = err.message || 'Something went wrong';
       setError(msg);
       toast.error(msg);
@@ -110,14 +145,13 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
     }
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────
+  if (!mounted) return null;
+
   return (
     <>
-      {/* React Toastify container — light theme, top-right */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
         newestOnTop
         closeOnClick
         pauseOnHover
@@ -129,69 +163,48 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
       <div
         onClick={handleBackdropClick}
         className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
-        aria-modal="true"
         role="dialog"
-        aria-labelledby="modal-title"
+        aria-modal="true"
       >
-        {/* Panel
-            – On mobile: full-width sheet sliding up from bottom, rounded only on top
-            – On sm+: centred card with rounded-2xl all around, max-w-2xl           */}
-        <div className="
-          relative w-full bg-white flex flex-col
-          rounded-t-2xl sm:rounded-2xl
-          shadow-2xl border border-gray-200
-          max-h-[92dvh] sm:max-h-[88vh]
-          sm:max-w-2xl
-          overflow-hidden
-        ">
+        {/* Modal */}
+        <div className="relative w-full bg-white flex flex-col rounded-t-2xl sm:rounded-2xl shadow-2xl border border-gray-200 max-h-[92dvh] sm:max-h-[88vh] sm:max-w-2xl overflow-hidden">
 
-          {/* ── Drag handle (mobile only) ── */}
+          {/* Mobile drag handle */}
           <div className="flex justify-center pt-3 pb-1 sm:hidden">
             <div className="w-10 h-1 rounded-full bg-gray-300" />
           </div>
 
-          {/* ── Header ── */}
-          <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 sticky top-0 bg-white z-10">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200 bg-white sticky top-0 z-10">
             <div>
-              <h2 id="modal-title" className="text-lg sm:text-xl font-bold text-gray-900">
-                Edit Idea
-              </h2>
-              <p className="text-xs text-gray-400 mt-0.5 hidden sm:block">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Edit Idea</h2>
+              <p className="text-xs text-gray-400 mt-1 hidden sm:block">
                 Make changes and save when done
               </p>
             </div>
             <button
               onClick={onClose}
-              aria-label="Close modal"
-              className="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              ✕
             </button>
           </div>
 
-          {/* ── Body ── */}
-          <div className="px-4 sm:px-6 py-5 sm:py-6 flex-1 overflow-y-auto">
+          {/* Body */}
+          <div className="px-4 sm:px-6 py-5 flex-1 overflow-y-auto">
             {loading ? (
-              <div className="space-y-4 animate-pulse">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="h-4 w-24 bg-gray-100 rounded" />
-                    <div className="h-11 bg-gray-100 rounded-lg" />
-                  </div>
-                ))}
+              <div className="flex justify-center items-center py-20">
+                <span className="loading loading-spinner loading-lg" />
               </div>
             ) : error && !form.title ? (
               <div className="p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm">
                 {error}
               </div>
             ) : (
-              <div className="space-y-4 sm:space-y-5">
-
-                {/* Title */}
+              <div className="space-y-5">
                 <Field label="Title" required>
                   <input
+                    type="text"
                     name="title"
                     value={form.title}
                     onChange={handleChange}
@@ -200,91 +213,83 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
                   />
                 </Field>
 
-                {/* Category */}
                 <Field label="Category">
                   <input
+                    type="text"
                     name="category"
                     value={form.category}
                     onChange={handleChange}
-                    placeholder="e.g. Tech, Health, Education"
+                    placeholder="Tech, Health, Education..."
                     className={inputCls}
                   />
                 </Field>
 
-                {/* Short Description */}
                 <Field label="Short Description">
                   <input
+                    type="text"
                     name="shortDescription"
                     value={form.shortDescription}
                     onChange={handleChange}
-                    placeholder="One-liner summary"
+                    placeholder="Short summary"
                     className={inputCls}
                   />
                 </Field>
 
-                {/* Full Description */}
                 <Field label="Description">
                   <textarea
                     name="description"
                     value={form.description}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Describe your idea in detail..."
+                    placeholder="Detailed description..."
                     className={`${inputCls} resize-none`}
                   />
                 </Field>
 
-                {/* Image URL */}
                 <Field label="Image URL">
                   <input
+                    type="text"
                     name="imageUrl"
                     value={form.imageUrl}
                     onChange={handleChange}
-                    placeholder="https://example.com/image.png"
+                    placeholder="https://example.com/image.jpg"
                     className={inputCls}
                   />
                   {form.imageUrl && (
                     <img
                       src={form.imageUrl}
                       alt="Preview"
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
-                      className="mt-2 h-28 w-full object-cover rounded-lg border border-gray-200"
+                      className="mt-3 h-32 w-full object-cover rounded-lg border border-gray-200"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                     />
                   )}
                 </Field>
 
-                {/* Inline update error */}
                 {error && (
-                  <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">
+                  <div className="bg-red-50 text-red-500 text-sm px-4 py-3 rounded-xl">
                     {error}
-                  </p>
+                  </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* ── Footer ── */}
+          {/* Footer */}
           {!loading && (
-            <div className="px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 sticky bottom-0 bg-white">
+            <div className="px-4 sm:px-6 py-4 border-t border-gray-200 bg-white flex flex-col-reverse sm:flex-row justify-end gap-3">
               <button
                 onClick={onClose}
                 disabled={updating}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={updating || !form.title.trim()}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold flex items-center justify-center gap-2 transition"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition disabled:opacity-50"
               >
-                {updating && (
-                  <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                )}
-                {updating ? 'Updating…' : 'Update Idea'}
+                {updating ? 'Updating...' : 'Update Idea'}
               </button>
             </div>
           )}
@@ -293,11 +298,6 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
     </>
   );
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const inputCls =
-  'w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
 
 function Field({ label, required, children }) {
   return (
@@ -310,3 +310,6 @@ function Field({ label, required, children }) {
     </div>
   );
 }
+
+const inputCls =
+  'w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';

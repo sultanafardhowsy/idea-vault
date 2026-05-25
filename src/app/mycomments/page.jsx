@@ -16,6 +16,8 @@ export default function MyCommentsPage() {
     if (session?.user?.id) fetchMyComments();
   }, [session]);
 
+  
+
   const fetchMyComments = async () => {
     setLoading(true);
     try {

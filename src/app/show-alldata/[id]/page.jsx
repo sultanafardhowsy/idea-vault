@@ -20,41 +20,7 @@ const ShowDetailsPage = async ({ params }) => {
     
   });
 
-  /* ── Not authenticated or forbidden ── */
-  // if (!res.ok) {
-  //   const status = res.status;
-  //   return (
-  //     <div className="max-w-6xl mx-auto px-4 py-20 min-h-screen flex flex-col items-center justify-center text-center">
-  //       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl rounded-2xl p-10 max-w-md w-full">
-  //         <div className="text-6xl mb-4">🔐</div>
-  //         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-  //           {status === 401 || status === 403
-  //             ? "Login Required"
-  //             : "Something went wrong"}
-  //         </h1>
-  //         <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm leading-relaxed">
-  //           {status === 401 || status === 403
-  //             ? "You need to be logged in to view the details of this idea."
-  //             : `Unable to load this idea (status ${status}). Please try again later.`}
-  //         </p>
-  //         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-  //           <Link
-  //             href="/login"
-  //             className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all text-sm"
-  //           >
-  //             Log In
-  //           </Link>
-  //           <Link
-  //             href="/show-alldata"
-  //             className="px-6 py-2.5 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-all text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
-  //           >
-  //             Back to Ideas
-  //           </Link>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  
 console.log(res);
   const details = await res.json();
 

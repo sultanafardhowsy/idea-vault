@@ -56,10 +56,16 @@ export default function NewIdeaPage() {
        email: user?.email,
       
     };
+
+ const {data:tokenData} = await authClient.token()
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/allidea`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+         headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${tokenData?.token}`
+        },
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error('Failed');
@@ -71,6 +77,8 @@ export default function NewIdeaPage() {
       setSubmitting(false);
     }
   }
+
+  
 
   const tagList = tags.split(',')?.map(t => t.trim()).filter(Boolean);
 
