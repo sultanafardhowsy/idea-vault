@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
   const [form, setForm] = useState({
@@ -13,19 +15,23 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState(null);
-  const [toast, setToast] = useState(null);
 
-  // ─── Fetch idea by ID on mount ───────────────────────────────────────────────
+  // ─── Fetch existing idea data ─────────────────────────────────────────────
   useEffect(() => {
     const fetchIdea = async () => {
       try {
         setLoading(true);
         setError(null);
+
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${ideaId}`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`,
+          { credentials: 'include' }
         );
+
         if (!res.ok) throw new Error('Failed to fetch idea');
+
         const data = await res.json();
+
         setForm({
           title: data.title || '',
           category: data.category || '',
@@ -34,7 +40,8 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
           imageUrl: data.imageUrl || '',
         });
       } catch (err) {
-        setError(err.message || 'Something went wrong');
+        setError(err.message);
+        toast.error(err.message || 'Failed to load idea');
       } finally {
         setLoading(false);
       }
@@ -43,17 +50,14 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
     if (ideaId) fetchIdea();
   }, [ideaId]);
 
-  // ─── ESC key closes modal ────────────────────────────────────────────────────
+  // ─── ESC key closes modal ─────────────────────────────────────────────────
   const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === 'Escape') onClose();
-    },
+    (e) => { if (e.key === 'Escape') onClose(); },
     [onClose]
   );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    // Prevent background scroll while modal is open
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
@@ -61,33 +65,28 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
     };
   }, [handleKeyDown]);
 
-  // ─── Click outside backdrop to close ────────────────────────────────────────
+  // ─── Click outside backdrop to close ─────────────────────────────────────
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) onClose();
   };
 
-  // ─── Field change helper ─────────────────────────────────────────────────────
+  // ─── Field change helper ──────────────────────────────────────────────────
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ─── Show toast helper ───────────────────────────────────────────────────────
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  // ─── Submit update ───────────────────────────────────────────────────────────
+  // ─── Submit update ────────────────────────────────────────────────────────
   const handleUpdate = async () => {
     try {
       setUpdating(true);
       setError(null);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${ideaId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/showalldata/${ideaId}`,
         {
-          method: 'PUT',
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(form),
         }
       );
@@ -97,190 +96,213 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
         throw new Error(errData.message || 'Failed to update idea');
       }
 
-      showToast('Idea updated successfully!');
+      toast.success('Idea updated successfully!');
       setTimeout(() => {
-        onSuccess(); // refresh the list in parent
-        onClose();   // close modal
-      }, 1000);
+        onSuccess();
+        onClose();
+      }, 1200);
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      const msg = err.message || 'Something went wrong';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setUpdating(false);
     }
   };
 
-  // ─── Render ──────────────────────────────────────────────────────────────────
+  // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    /* Backdrop */
-    <div
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-      aria-modal="true"
-      role="dialog"
-      aria-labelledby="modal-title"
-    >
-      {/* Panel */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col">
+    <>
+      {/* React Toastify container — light theme, top-right */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
 
-        {/* ── Toast ── */}
-        {toast && (
-          <div
-            className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 px-5 py-2.5 rounded-full text-sm font-medium shadow-lg transition-all
-              ${toast.type === 'success'
-                ? 'bg-emerald-500 text-white'
-                : 'bg-red-500 text-white'}`}
-          >
-            {toast.message}
+      {/* Backdrop */}
+      <div
+        onClick={handleBackdropClick}
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4"
+        aria-modal="true"
+        role="dialog"
+        aria-labelledby="modal-title"
+      >
+        {/* Panel
+            – On mobile: full-width sheet sliding up from bottom, rounded only on top
+            – On sm+: centred card with rounded-2xl all around, max-w-2xl           */}
+        <div className="
+          relative w-full bg-white flex flex-col
+          rounded-t-2xl sm:rounded-2xl
+          shadow-2xl border border-gray-200
+          max-h-[92dvh] sm:max-h-[88vh]
+          sm:max-w-2xl
+          overflow-hidden
+        ">
+
+          {/* ── Drag handle (mobile only) ── */}
+          <div className="flex justify-center pt-3 pb-1 sm:hidden">
+            <div className="w-10 h-1 rounded-full bg-gray-300" />
           </div>
-        )}
 
-        {/* ── Header ── */}
-        <div className="flex items-center justify-between px-6 py-5 border-b dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-          <h2 id="modal-title" className="text-xl font-bold text-gray-900 dark:text-white">
-            Edit Idea
-          </h2>
-          <button
-            onClick={onClose}
-            aria-label="Close modal"
-            className="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 transition"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* ── Body ── */}
-        <div className="px-6 py-6 flex-1">
-
-          {/* Loading skeleton */}
-          {loading ? (
-            <div className="space-y-4 animate-pulse">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="h-11 bg-gray-100 dark:bg-gray-800 rounded-lg" />
-              ))}
+          {/* ── Header ── */}
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div>
+              <h2 id="modal-title" className="text-lg sm:text-xl font-bold text-gray-900">
+                Edit Idea
+              </h2>
+              <p className="text-xs text-gray-400 mt-0.5 hidden sm:block">
+                Make changes and save when done
+              </p>
             </div>
-          ) : error && !form.title ? (
-            /* Fetch error — no data to show */
-            <div className="p-4 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl text-center">
-              {error}
-            </div>
-          ) : (
-            <div className="space-y-5">
+            <button
+              onClick={onClose}
+              aria-label="Close modal"
+              className="w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
-              {/* Title */}
-              <Field label="Title" required>
-                <input
-                  name="title"
-                  value={form.title}
-                  onChange={handleChange}
-                  placeholder="Your idea title"
-                  className={inputCls}
-                />
-              </Field>
+          {/* ── Body ── */}
+          <div className="px-4 sm:px-6 py-5 sm:py-6 flex-1 overflow-y-auto">
+            {loading ? (
+              <div className="space-y-4 animate-pulse">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="space-y-1.5">
+                    <div className="h-4 w-24 bg-gray-100 rounded" />
+                    <div className="h-11 bg-gray-100 rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            ) : error && !form.title ? (
+              <div className="p-4 bg-red-50 text-red-600 rounded-xl text-center text-sm">
+                {error}
+              </div>
+            ) : (
+              <div className="space-y-4 sm:space-y-5">
 
-              {/* Category */}
-              <Field label="Category">
-                <input
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  placeholder="e.g. Tech, Health, Education"
-                  className={inputCls}
-                />
-              </Field>
-
-              {/* Short Description */}
-              <Field label="Short Description">
-                <input
-                  name="shortDescription"
-                  value={form.shortDescription}
-                  onChange={handleChange}
-                  placeholder="One-liner summary"
-                  className={inputCls}
-                />
-              </Field>
-
-              {/* Full Description */}
-              <Field label="Description">
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  rows={4}
-                  placeholder="Describe your idea in detail..."
-                  className={`${inputCls} resize-none`}
-                />
-              </Field>
-
-              {/* Image URL */}
-              <Field label="Image URL">
-                <input
-                  name="imageUrl"
-                  value={form.imageUrl}
-                  onChange={handleChange}
-                  placeholder="https://example.com/image.png"
-                  className={inputCls}
-                />
-                {form.imageUrl && (
-                  <img
-                    src={form.imageUrl}
-                    alt="Preview"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                    className="mt-2 h-28 w-full object-cover rounded-lg border dark:border-gray-700"
+                {/* Title */}
+                <Field label="Title" required>
+                  <input
+                    name="title"
+                    value={form.title}
+                    onChange={handleChange}
+                    placeholder="Your idea title"
+                    className={inputCls}
                   />
-                )}
-              </Field>
+                </Field>
 
-              {/* Inline update error */}
-              {error && (
-                <p className="text-sm text-red-500 bg-red-50 dark:bg-red-900/30 px-4 py-3 rounded-xl">
-                  {error}
-                </p>
-              )}
+                {/* Category */}
+                <Field label="Category">
+                  <input
+                    name="category"
+                    value={form.category}
+                    onChange={handleChange}
+                    placeholder="e.g. Tech, Health, Education"
+                    className={inputCls}
+                  />
+                </Field>
+
+                {/* Short Description */}
+                <Field label="Short Description">
+                  <input
+                    name="shortDescription"
+                    value={form.shortDescription}
+                    onChange={handleChange}
+                    placeholder="One-liner summary"
+                    className={inputCls}
+                  />
+                </Field>
+
+                {/* Full Description */}
+                <Field label="Description">
+                  <textarea
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    rows={4}
+                    placeholder="Describe your idea in detail..."
+                    className={`${inputCls} resize-none`}
+                  />
+                </Field>
+
+                {/* Image URL */}
+                <Field label="Image URL">
+                  <input
+                    name="imageUrl"
+                    value={form.imageUrl}
+                    onChange={handleChange}
+                    placeholder="https://example.com/image.png"
+                    className={inputCls}
+                  />
+                  {form.imageUrl && (
+                    <img
+                      src={form.imageUrl}
+                      alt="Preview"
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                      className="mt-2 h-28 w-full object-cover rounded-lg border border-gray-200"
+                    />
+                  )}
+                </Field>
+
+                {/* Inline update error */}
+                {error && (
+                  <p className="text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">
+                    {error}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ── Footer ── */}
+          {!loading && (
+            <div className="px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 sticky bottom-0 bg-white">
+              <button
+                onClick={onClose}
+                disabled={updating}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdate}
+                disabled={updating || !form.title.trim()}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold flex items-center justify-center gap-2 transition"
+              >
+                {updating && (
+                  <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                )}
+                {updating ? 'Updating…' : 'Update Idea'}
+              </button>
             </div>
           )}
         </div>
-
-        {/* ── Footer ── */}
-        {!loading && (
-          <div className="px-6 py-4 border-t dark:border-gray-700 flex justify-end gap-3 sticky bottom-0 bg-white dark:bg-gray-900">
-            <button
-              onClick={onClose}
-              disabled={updating}
-              className="px-5 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleUpdate}
-              disabled={updating || !form.title.trim()}
-              className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold flex items-center gap-2 transition"
-            >
-              {updating && (
-                <svg className="w-4 h-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-              )}
-              {updating ? 'Updating…' : 'Update Idea'}
-            </button>
-          </div>
-        )}
       </div>
-    </div>
+    </>
   );
 }
 
-// ─── Tiny helpers ──────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const inputCls =
-  'w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
+  'w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition';
 
 function Field({ label, required, children }) {
   return (
     <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label className="block text-sm font-medium text-gray-700">
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
