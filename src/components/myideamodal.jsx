@@ -60,6 +60,11 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
           shortDescription: data.shortDescription || '',
           description: data.description || '',
           imageUrl: data.imageUrl || '',
+          founder: data.founder || '',
+          funding: data.funding || '',
+          status: data.status || '',
+          email: data.email || '',
+          tags: data.tags || '',
         });
       } catch (err) {
         console.error(err);
@@ -246,6 +251,59 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
                   />
                 </Field>
 
+
+                <Field label="Founder Name">
+                  <input
+                    type="text"
+                    name="founder"
+                    value={form.founder}
+                    onChange={handleChange}
+                    placeholder="Founder Name"
+                    className={inputCls}
+                  />
+                </Field>
+
+                <Field label="Funding">
+                  <input
+                    type="text"
+                    name="funding"
+                    value={form.funding}
+                    onChange={handleChange}
+                    placeholder="Funding amount"
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Status">
+                  <input
+                    type="text"
+                    name="status"
+                    value={form.status}
+                    onChange={handleChange}
+                    placeholder="Funding amount"
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Email">
+                  <input
+                    type="text"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="email"
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Tags">
+                  <input
+                    type="text"
+                    name="tags"
+                    value={form.tags}
+                    onChange={handleChange}
+                    placeholder="Funding amount"
+                    className={inputCls}
+                  />
+                </Field>
+
                 <Field label="Image URL">
                   <input
                     type="text"
@@ -280,14 +338,14 @@ export default function EditIdeaModal({ ideaId, onClose, onSuccess }) {
               <button
                 onClick={onClose}
                 disabled={updating}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-50"
+                className="w-full bg-blue-600 sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdate}
                 disabled={updating || !form.title.trim()}
-                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition disabled:opacity-50"
+                className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-amber-700 text-white text-sm font-semibold transition disabled:opacity-50"
               >
                 {updating ? 'Updating...' : 'Update Idea'}
               </button>

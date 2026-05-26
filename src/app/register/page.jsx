@@ -30,9 +30,7 @@ const RegisterPage = () => {
 
         if (res) {
             toast("Sign-up successful");
-            // await authClient.signOut();
-
-            // toast.success("Logged out successfully 👋");
+            
             router.push("/");
         }
     };

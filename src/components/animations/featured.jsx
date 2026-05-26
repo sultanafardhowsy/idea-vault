@@ -70,7 +70,6 @@ const router = useRouter();
       variant="ghost"
       className=" btn bg-cyan-500 mt-1 text-white"
     >
-      {/* <FiExternalLink className="mr-2" /> */}
       View Details
     </Button>
            
