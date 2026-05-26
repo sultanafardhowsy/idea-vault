@@ -8,15 +8,28 @@ export async function proxy(request) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
-  if (!session && !session?.user){
-    return NextResponse.redirect( new URL("/login",request.url))
+   // If user is not logged in
+  if (!session || !session.user) {
+    // Save current path
+    const loginUrl = new URL('/login', request.url);
+
+    loginUrl.searchParams.set(
+      'callbackUrl',
+      request.nextUrl.pathname
+    );
+
+    return NextResponse.redirect(loginUrl);
   }
+
+  return NextResponse.next();
 }
+
 
 
 export const config = {
   matcher: ["/show-alldata/:path","/mycomments","/profile","/add-idea","/my-idea"],
 };
+
 
 
 

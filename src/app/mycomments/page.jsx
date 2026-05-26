@@ -85,15 +85,6 @@ export default function MyCommentsPage() {
     }
   };
 
-//   if (loading) {
-//     return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Loading...</div>;
-//   }
-
-
-// // Optional: Fallback if there's no active session yet
-// if (!session?.user) {
-//   return <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">Please sign in to view your comments.</div>;
-// }
 
 
   if (isPending) {

@@ -11,8 +11,8 @@
   "dependencies": {
     "@better-auth/mongo-adapter": "^1.6.11",
     "@gravity-ui/icons": "^2.18.0",
-    "@heroui/react": "^3.0.5",
-    "@heroui/styles": "^3.0.5",
+    "@heroui/react": "^3.1.0",
+    "@heroui/styles": "^3.1.0",
     "@teispace/next-themes": "^0.5.0",
     "animate.css": "^4.1.1",
     "better-auth": "^1.6.11",

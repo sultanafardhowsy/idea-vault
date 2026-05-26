@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { authClient } from '@/lib/auth-client';
 import { Check } from 'lucide-react';
@@ -6,43 +6,58 @@ import Link from 'next/link';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { GrGoogle } from 'react-icons/gr';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const LoginPage = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
+  const callbackUrl =
+    searchParams.get('callbackUrl') || '/';
 
-    
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
 
-    const handleLoginFunc = async (data) => {
-        const { email, password } = data;
-        const { data: res, error } = await authClient.signIn.email({
-            email,
-            password,
-            rememberMe: true,
-            callbackURL: "/",
-        });
+  // Email login
+  const handleLoginFunc = async (data) => {
+    const { email, password } = data;
 
-        if (error) {
-            toast.error(error.message || "Login failed");
-        }
+    const { data: res, error } =
+      await authClient.signIn.email({
+        email,
+        password,
+        rememberMe: true,
+        callbackURL: callbackUrl,
+      });
 
-        if (res) {
-            toast.success("Login successful 🎉");
-        }
-    };
+    if (error) {
+      toast.error(error.message || 'Login failed');
+      return;
+    }
 
-    const handlGoogleSignIn = async () => {
-        toast.loading("Redirecting to Google...");
-        try {
-            await authClient.signIn.social({
-                provider: "google",
-                callbackURL: "/",
-            });
-        } catch (error) {
-            toast.error("Google sign-in failed ❌");
-        }
-    };
+    toast.success('Login successful 🎉');
+
+    router.push(callbackUrl);
+  };
+
+  // Google login
+  const handlGoogleSignIn = async () => {
+    toast.loading('Redirecting to Google...');
+
+    try {
+      await authClient.signIn.social({
+        provider: 'google',
+        callbackURL: callbackUrl,
+      });
+    } catch (error) {
+      toast.error('Google sign-in failed ❌');
+    }
+  };
 
     return (
         <div className='min-h-[85vh] w-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-800 text-white dark:from-slate-950 dark:via-slate-900 dark:to-blue-950 transition-colors duration-300'>
