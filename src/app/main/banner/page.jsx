@@ -419,8 +419,8 @@ export default function HeroPage() {
             </p>
 
             <div className="hero-cta-row">
-              <a href="#" className="hero-btn-primary">Deposit an Idea +</a>
-              <a href="#" className="hero-btn-ghost">Explore the Vault 🔍</a>
+              <a href="add-idea" className="hero-btn-primary">Deposit an Idea +</a>
+              <a href="show-alldata" className="hero-btn-ghost">Explore the Vault 🔍</a>
             </div>
 
             <div className="hero-stats">

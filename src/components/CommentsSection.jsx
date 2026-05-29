@@ -18,6 +18,11 @@ export default function CommentsSection({ ideaId,title }) {
   const [editText, setEditText] = useState("");
   const [deletingId, setDeletingId] = useState(null);
   const editRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true); // ✅ যোগ করো
+  }, []);
 
   useEffect(() => {
     fetchComments();
@@ -149,8 +154,10 @@ export default function CommentsSection({ ideaId,title }) {
       </h2>
 
       {/* Add Comment */}
-      {user ? (
-        <form onSubmit={handleAdd} className="mb-8">
+      {!mounted ? (
+  <div className="mb-8 h-16 animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl" />
+) : user ? (
+  <form onSubmit={handleAdd} className="mb-8">
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
               {user.image ? (

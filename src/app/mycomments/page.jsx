@@ -8,34 +8,55 @@ export default function MyCommentsPage() {
   const { data: session, isPending } = authClient.useSession();
   
   const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
+  const [mounted, setMounted] = useState(false); 
 
   useEffect(() => {
-    if (session?.user?.id) fetchMyComments();
-  }, [session]);
-
+  if (session?.user?.id) fetchMyComments();
+}, [session?.user?.id]); 
   
 
+
   const fetchMyComments = async () => {
+  try {
     setLoading(true);
-    try {
-      const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
-      if (!serverUrl) return;
-      const res = await fetch(
-        `${serverUrl}/mycomments?userId=${encodeURIComponent(session.user.id)}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch comments");
-      const data = await res.json();
-      setComments(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error(err);
-      setComments([]);
-    } finally {
-      setLoading(false);
+
+    const serverUrl = process.env.NEXT_PUBLIC_SERVER_URL;
+    if (!serverUrl || !session) return;
+
+    const { data: tokenData } = await authClient.token();
+
+    if (!tokenData?.token) {
+      throw new Error('Failed to retrieve auth token');
     }
-  };
+
+    const res = await fetch(
+      `${serverUrl}/mycomments?userId=${session.user.id}`,
+      {
+        method: 'GET',
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${tokenData.token}`,
+        },
+        credentials: 'include',
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error);
+    }
+
+    setComments(data);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Delete Comment
   const deleteComment = async (id) => {
