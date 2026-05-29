@@ -2,7 +2,7 @@
 
 IdeaVault is a dynamic, web-based platform designed for innovators, entrepreneurs, and visionaries to share startup concepts, receive community validation, and refine ideas collectively. Moving away from traditional scheduling systems, IdeaVault focuses entirely on open crowdsourced innovation, feedback loops, and trend discovery.
 
-🌐 [Live Site URL](YOUR_LIVE_SITE_URL_HERE)
+🌐 [Live Site URL]https://idea-vault-phi-five.vercel.app
 
 ---
 
