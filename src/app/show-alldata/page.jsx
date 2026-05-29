@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import IdeaCard from "@/components/ideacard";
 import { FiFilter, FiCalendar, FiSearch } from "react-icons/fi";
+import { Spinner } from "@heroui/react";
 
 const CATEGORIES = [
   "All",
@@ -124,10 +125,10 @@ const IdeaPage = () => {
       )}
 
       {loading && (
-        <p className="text-center text-gray-400 dark:text-gray-500 mb-4 animate-pulse">
-          Loading ideas…
-        </p>
-      )}
+  <div className="flex justify-center items-center py-10">
+    <Spinner size="lg" color="primary" />
+  </div>
+)}
 
       {/* ── Card grid ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
