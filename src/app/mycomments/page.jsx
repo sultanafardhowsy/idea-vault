@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { authClient, useSession } from '@/lib/auth-client';
+import { toast } from "react-toastify";
 
 export default function MyCommentsPage() {
   //const { data: session } = useSession();
@@ -17,6 +18,40 @@ export default function MyCommentsPage() {
   if (session?.user?.id) fetchMyComments();
 }, [session?.user?.id]); 
   
+
+
+const confirmDelete = (id) => {
+  toast(
+    ({ closeToast }) => (
+      <div>
+        <p>Are you sure you want to delete this comment?</p>
+
+        <div className="flex gap-2 mt-3">
+          <button
+            className="btn btn-sm btn-error"
+            onClick={() => {
+              deleteComment(id);
+              closeToast();
+            }}
+          >
+            Yes
+          </button>
+
+          <button
+            className="btn btn-sm"
+            onClick={closeToast}
+          >
+            No
+          </button>
+        </div>
+      </div>
+    ),
+    {
+      autoClose: false,
+      closeOnClick: false,
+    }
+  );
+};
 
 
   const fetchMyComments = async () => {
@@ -52,7 +87,9 @@ export default function MyCommentsPage() {
 
     setComments(data);
   } catch (error) {
-    console.error(error);
+  console.error(error);
+  toast.error(error.message || "Failed to load comments");
+
   } finally {
     setLoading(false);
   }
@@ -60,7 +97,7 @@ export default function MyCommentsPage() {
 
   // Delete Comment
   const deleteComment = async (id) => {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+    
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
@@ -69,11 +106,11 @@ export default function MyCommentsPage() {
 
       if (res.ok) {
         setComments(comments.filter(c => c._id !== id));
-        alert("Comment deleted successfully");
+        toast.success("Comment deleted successfully");
       }
     } catch (err) {
-      alert("Failed to delete comment");
-    }
+  toast.error("Failed to delete comment");
+}
   };
 
   // Start Editing
@@ -84,7 +121,10 @@ export default function MyCommentsPage() {
 
   // Update Comment
   const updateComment = async (id) => {
-    if (!editText.trim()) return alert("Comment cannot be empty");
+    if (!editText.trim()) {
+  toast.warning("Comment cannot be empty");
+  return;
+}
 
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
@@ -99,11 +139,11 @@ export default function MyCommentsPage() {
         ));
         setEditingId(null);
         setEditText('');
-        alert("Comment updated successfully");
+       toast.success("Comment updated successfully");
       }
     } catch (err) {
-      alert("Failed to update comment");
-    }
+  toast.error("Failed to update comment");
+}
   };
 
 
@@ -206,7 +246,7 @@ return (
                           Edit
                         </button>
                         <button
-                          onClick={() => deleteComment(comment._id)}
+                          onClick={() => confirmDelete(comment._id)}
                           className="px-4 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded-xl transition"
                         >
                           Delete

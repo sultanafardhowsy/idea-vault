@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { authClient } from '@/lib/auth-client';
 import EditIdeaModal from '@/components/myideamodal';
+import { toast } from "react-toastify";
 
 export default function MyIdeasPage() {
   const { data: session, isPending } = authClient.useSession();
@@ -18,51 +19,70 @@ export default function MyIdeasPage() {
     setMounted(true);
   }, []);
 
-  const fetchMyIdeas = async () => {
-    if (!session?.user?.email) return;
-    setLoadingIdeas(true);
-    setError(null);
+ const fetchMyIdeas = async () => {
+  if (!session?.user?.email) return;
 
+  setLoadingIdeas(true);
+  setError(null);
+
+  try {
     const { data: tokenData } = await authClient.token();
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas-by-email?email=${session.user.email}`,
-        {
-          headers: {
-            'content-type': 'application/json',
-            authorization: `Bearer ${tokenData?.token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error('Failed to fetch ideas');
-      const data = await res.json();
-      setIdeas(Array.isArray(data) ? data : []);
-    } catch {
-      setError('Failed to load ideas');
-      setIdeas([]);
-    } finally {
-      setLoadingIdeas(false);
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas-by-email?email=${session.user.email}`,
+      {
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${tokenData?.token}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch ideas");
     }
-  };
+
+    const data = await res.json();
+    setIdeas(Array.isArray(data) ? data : []);
+  } catch (error) {
+    setError("Failed to load ideas");
+    setIdeas([]);
+
+    toast.error("Failed to load ideas");
+  } finally {
+    setLoadingIdeas(false);
+  }
+};
 
   useEffect(() => {
     if (!isPending && session?.user?.email) fetchMyIdeas();
   }, [session, isPending]);
 
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this idea permanently?')) return;
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${id}`,
-        { method: 'DELETE' }
-      );
-      if (!res.ok) throw new Error('Failed to delete');
-      fetchMyIdeas();
-    } catch (err) {
-      alert(err.message);
+ const handleDelete = async (id) => {
+  if (!confirm("Delete this idea permanently?")) return;
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${id}`,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to delete");
     }
-  };
+
+    // Show success first
+    toast.success("Idea deleted successfully!");
+
+    // Then refresh the list
+    await fetchMyIdeas();
+  } catch (error) {
+    console.error(error);
+    toast.error("Failed to delete idea");
+  }
+};
 
   // ── Before mount: render static shell that matches SSR exactly ──
   if (!mounted) {
