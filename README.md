@@ -54,7 +54,7 @@ Follow these steps to run the client application locally on your computer:
 1. **Clone the repository:**
    
 ```bash
-   git clone [https://github.com/sultanafardhowsy/ideavault-client.git](https://github.com/YOUR_GITHUB_USERNAME/ideavault-client.git)
+   git clone https://github.com/sultanafardhowsy/idea-vault.git
    cd ideavault-client
    npm i
    copy .env.example .env.local
