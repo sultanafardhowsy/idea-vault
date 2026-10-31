@@ -62,3 +62,4 @@ Follow these steps to run the client application locally on your computer:
    Copy-Item .env.example .env.local
    bash
    npm run dev
+** one of my best project
