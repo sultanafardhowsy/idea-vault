@@ -12,7 +12,7 @@ const ForgotPasswordPage = () => {
 
     const handleResetFunc = async (data) => {
         const { email } = data;
-        const { data: res, error } = await authClient.forgetPassword({
+        const { data: res, error } = await authClient.requestPasswordReset({
             email,
             redirectTo: "/reset-password",
         });

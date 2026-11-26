@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { authClient, useSession } from '@/lib/auth-client';
+import { authClient, authHeaders } from '@/lib/auth-client';
 import { toast } from "react-toastify";
 
 export default function MyCommentsPage() {
@@ -102,12 +102,12 @@ const confirmDelete = (id) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
         method: 'DELETE',
+        headers: await authHeaders(),
       });
 
-      if (res.ok) {
-        setComments(comments.filter(c => c._id !== id));
-        toast.success("Comment deleted successfully");
-      }
+      if (!res.ok) throw new Error();
+      setComments(comments.filter(c => c._id !== id));
+      toast.success("Comment deleted successfully");
     } catch (err) {
   toast.error("Failed to delete comment");
 }
@@ -129,18 +129,17 @@ const confirmDelete = (id) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/comments/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: await authHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ text: editText }),
       });
 
-      if (res.ok) {
-        setComments(comments?.map(c => 
-          c._id === id ? { ...c, text: editText, updatedAt: new Date() } : c
-        ));
-        setEditingId(null);
-        setEditText('');
-       toast.success("Comment updated successfully");
-      }
+      if (!res.ok) throw new Error();
+      setComments(comments?.map(c =>
+        c._id === id ? { ...c, text: editText, updatedAt: new Date() } : c
+      ));
+      setEditingId(null);
+      setEditText('');
+      toast.success("Comment updated successfully");
     } catch (err) {
   toast.error("Failed to update comment");
 }

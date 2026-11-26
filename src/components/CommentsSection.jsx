@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { authClient } from "@/lib/auth-client";
+import { authClient, authHeaders } from "@/lib/auth-client";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
@@ -49,7 +49,7 @@ export default function CommentsSection({ ideaId,title }) {
     try {
       const res = await fetch(`${BASE}/comments`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: await authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({
           ideaId,
           title,
@@ -80,7 +80,7 @@ export default function CommentsSection({ ideaId,title }) {
     try {
       const res = await fetch(`${BASE}/comments/${commentId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: await authHeaders({ "Content-Type": "application/json" }),
         body: JSON.stringify({ text: editText }),
       });
       if (res.ok) {
@@ -106,6 +106,7 @@ export default function CommentsSection({ ideaId,title }) {
     try {
       const res = await fetch(`${BASE}/comments/${commentId}`, {
         method: "DELETE",
+        headers: await authHeaders(),
       });
       if (res.ok) {
         setComments((prev) => prev.filter((c) => c._id !== commentId));

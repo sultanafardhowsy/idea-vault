@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { authClient } from '@/lib/auth-client';
+import { authClient, authHeaders } from '@/lib/auth-client';
 import EditIdeaModal from '@/components/myideamodal';
 import { toast } from "react-toastify";
 
@@ -66,6 +66,7 @@ export default function MyIdeasPage() {
       `${process.env.NEXT_PUBLIC_SERVER_URL}/ideas/${id}`,
       {
         method: "DELETE",
+        headers: await authHeaders(),
       }
     );
 

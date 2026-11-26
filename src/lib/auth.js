@@ -4,7 +4,6 @@ import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { jwt } from "better-auth/plugins";
-console.log(process.env.MONGO_URI);
 const client = new MongoClient(process.env.MONGO_URI);
 const db = client.db("ideavault");
 
@@ -14,8 +13,17 @@ export const auth = betterAuth({
     client
   }),
   emailAndPassword: { 
-    enabled: true, 
-  }, 
+    enabled: true,
+    // Called by authClient.requestPasswordReset(). `url` is the link the user must open.
+    // TODO: connect an email provider (Resend, Nodemailer, ...) to send `url` to user.email.
+    sendResetPassword: async ({ user, url }) => {
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[dev] Password reset link for ${user.email}: ${url}`);
+        return;
+      }
+      throw new Error("Password reset email is not configured");
+    },
+  },
  socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
